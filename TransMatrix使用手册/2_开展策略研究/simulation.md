@@ -9,7 +9,7 @@
 
 下图是逻辑示例：
 <div align=center>
-<img width="1000" src="pics/2ma.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/2ma.png"/>
 </div>
 <div align=center style="font-size:12px">双均线策略</div>
 <br />
@@ -80,7 +80,7 @@ evaluator:
 
 如下图所示，我们把当前策略的目录结构和 config.yaml 文件的内部放在一起作对比，便能很直观地看到我们是怎么配置回测信息的。
 <div align=center>
-<img width="1000" src="pics/sim_dir.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/sim_dir.png"/>
 </div>
 <div align=center style="font-size:12px">目录结构</div>
 <br />
@@ -409,7 +409,7 @@ mat = run_matrix('config.yaml')
 我们运行该代码单元格，输出以下结果：
 
 <div align=center>
-<img width="1000" src="pics/sim_future.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/sim_future.png"/>
 </div>
 <div align=center style="font-size:12px">回测结果</div>
 <br />
@@ -423,7 +423,7 @@ strategy = mat.strategies['CTA']
 strategy.get_trade_table()
 ```
 <div align=center>
-<img width="1000" src="pics/sim_future_trade.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/sim_future_trade.png"/>
 </div>
 <div align=center style="font-size:12px">交易记录</div>
 <br />
@@ -598,7 +598,7 @@ matrix.eval() # 对回测结果作评价
 
 运行本单元格，输出以下内容：
 <div align=center>
-<img width="1000" src="pics/sim_stock.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/sim_stock.png"/>
 </div>
 <div align=center style="font-size:12px">回测结果</div>
 <br />
@@ -609,7 +609,7 @@ matrix.eval() # 对回测结果作评价
 
 前文我们以一个期货 CTA 策略和一个股票 CTA 策略为示例，详细介绍了如何使用 TransMatrix 系统开展策略研究。事实上，TransMatrix 支持各种类型的策略回测，包括但不限于：股票 T0、期货做市、ETF 套利、可转债高频等等。系统也提供了不同类型的策略示例，参见[这里]。
 <div align=center>
-<img width="1000" src="pics/sim_demo.png"/>
+<img width="500" src="TransMatrix使用手册/pics/sim_demo.png"/>
 </div>
 <div align=center style="font-size:12px">回测场景支持</div>
 <br />

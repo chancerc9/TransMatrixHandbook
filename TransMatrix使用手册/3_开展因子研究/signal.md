@@ -110,7 +110,7 @@ strategy = mat.strategies['reverse_factor']
 strategy.signal.to_dataframe()
 ```
 <div align=center>
-<img width="1000" src="pics/signal_factor.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/signal_factor.png"/>
 </div>
 <div align=center style="font-size:12px">因子数据</div>
 <br />
@@ -191,7 +191,7 @@ SimpleEvaluator 继承自基类 SignalEvaluator。所有因子评价组件都要
 
 我们再次运行 run.ipynb 里的单元格，得到以下输出：
 <div align=center>
-<img width="1000" src="pics/signal_eval.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/signal_eval.png"/>
 </div>
 <div align=center style="font-size:12px">因子评价</div>
 <br />
@@ -224,7 +224,7 @@ Out:
 另一种保存因子数据的方式，是在配置信息中，指定要保存的目标表名，Matrix 引擎会自动保存计算得到的因子数据。如下图所示：
 
 <div align=center>
-<img width="1000" src="pics/save_signal.png"/>
+<img width="800" src="TransMatrix使用手册/pics/save_signal.png"/>
 </div>
 <div align=center style="font-size:12px">因子保存</div>
 <br />
@@ -239,7 +239,7 @@ Out:
 
 一个完整的股票多因子策略，通常包括以下流程：
 <div align=center>
-<img width="1000" src="pics/sig_all.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/sig_all.png"/>
 </div>
 <div align=center style="font-size:12px">多因子策略研究流程</div>
 <br />
@@ -252,7 +252,7 @@ Out:
 
 首先，我们选择以下 10 个因子，并假设它们都是有效的 alpha 因子，不额外作单因子检验。
 <div align=center>
-<img width="1000" src="pics/10factor.png"/>
+<img width="500" src="TransMatrix使用手册/pics/10factor.png"/>
 </div>
 <div align=center style="font-size:12px">10个因子及说明</div>
 <br />
@@ -445,7 +445,7 @@ print('数据完成加载')
 display(factor_data)
 ```
 <div align=center>
-<img width="1000" src="pics/signal_whole_1.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/signal_whole_1.png"/>
 </div>
 <div align=center style="font-size:12px">读取因子数据</div>
 <br />
@@ -527,7 +527,7 @@ Out:
 
 这部分包含 2 个步骤，1 是信号生成，这与因子计算类似，我们加载因子数据，使用模型预测得到信号并保存到数据库里；2 是信号评价，添加评价组件并实现评价逻辑，便可以对信号进行评价。考虑到评价组件的代码篇幅较长，这里不作介绍，具体可以参照系统附带的测例模板“研究全流程”。下图是信号评价的结果：
 <div align=center>
-<img width="1000" src="pics/signal_whole_2.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/signal_whole_2.png"/>
 </div>
 <div align=center style="font-size:12px">信号评价</div>
 <br />
@@ -536,7 +536,7 @@ Out:
 
 在经过信号评价后，我们认为信号是有效的，可以进一步加工成一个股票策略。这里，我们每期按信号大小，对股票作排序，选取前 50 只信号值最大的股票，14点30分等权买入。策略代码和评价组件代码，可参考系统模板测例。运行完成输出结果如下：
 <div align=center>
-<img width="1000" src="pics/signal_whole_3.png"/>
+<img width="1000" src="TransMatrix使用手册/pics/signal_whole_3.png"/>
 </div>
 <div align=center style="font-size:12px">回测结果</div>
 <br />

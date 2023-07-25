@@ -290,14 +290,14 @@ result_df = run_optim_matrix('config.yaml')
 - 使用网格搜索的策略研究参数优化
 
 <div align=center>
-<img width="300" src="pics\optim_1.png"/>
+<img width="300" src="TransMatrix使用手册/pics/optim_1.png"/>
 </div>
 <div align=left style="font-size:12px"></div>
 
 - 使用遗传算法的因子研究参数优化
 
 <div align=center>
-<img width="300" src="pics\optim_2.png"/>
+<img width="300" src="TransMatrix使用手册/pics/optim_2.png"/>
 </div>
 <div align=left style="font-size:12px"></div>
 
