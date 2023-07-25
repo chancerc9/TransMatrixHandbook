@@ -152,7 +152,7 @@ class TestEval(SignalEvaluator):
     def init(self):
         # 订阅数据
         self.subscribe_data(
-            'pv', ['default','stock_bar_1day',self.codes,'open,high,low,close', 0]
+            'pv', ['default','stock_bar_1day',self.codes,'open,high,low,close', 1]
         )
     
     def critic(self):

@@ -67,7 +67,7 @@ TransMatrix 是一个高度自定义化的量化投研框架，可以帮助用�
       def init(self):
           # 订阅数据
           self.subscribe_data(
-              'pv', ['default','stock_bar_1day',self.codes,'open,high,low,close', 0]
+              'pv', ['default','stock_bar_1day',self.codes,'open,high,low,close', 1]
           )
       
       def critic(self):
