@@ -95,7 +95,7 @@ Matrix 引擎是系统的核心组件，它的功能包括：
 - 运行回测
 - 调用评价组件，运行评价（可选）
 
-关于 Matrix 引擎更详细的说明，参见[这里]。为了使策略程序按照我们的预期思路运行，我们需要对 Matrix 引擎作如下配置：
+关于 Matrix 引擎更详细的说明，参见[这里](3_接口说明/Matrix/matrix.md)。为了使策略程序按照我们的预期思路运行，我们需要对 Matrix 引擎作如下配置：
 
 ```text
 matrix:
@@ -113,7 +113,7 @@ matrix:
             account: detail # 账户类型为detail
 ```
 
-如上所示，这里，我们将 mode 设置为 simulation，代表当前模式为策略研究。TransMatrix 支持2种研究模式：1是策略研究，2是因子研究。因子研究模式，相关介绍参见[第三章](3_开展因子研究/signal.md)，策略研究模式需要将 mode 设为 simulation。
+如上所示，这里，我们将 mode 设置为 simulation，代表当前模式为策略研究。TransMatrix 支持2种研究模式：1是策略研究，2是因子研究。因子研究模式，相关介绍参见[第三章](TransMatrix使用手册/3_开展因子研究/signal.md)，策略研究模式需要将 mode 设为 simulation。
 
 之后配置回测区间，这里我们选择回测开始时间为2021年1月1日，结束时间为2022年12月31日收盘。
 
@@ -147,7 +147,7 @@ matrix:
 ```
     策略所需要用到的行情数据，策略组件会在行情数据更新时回调方法 on_market_update，行情数据的频率决定了 on_market_update 的执行频率。若订阅的行情数据是日频，则 on_market_update 每个交易日都会被调用，若是10分钟频率，则该方法每隔10分钟都会调用。
     
-    这里，我们订阅的是 meta_data数据库里的future_bar_10min表，该表存放了期货10分钟的 Bar 行情数据。关于数据库 API 的详细说明，参见说明文档[数据库](3_开展因子研究/signal.md)部分，关于 DataApi 的详细说明，参见说明文档[DataApi](3_开展因子研究/signal.md) 部分。
+    这里，我们订阅的是 meta_data数据库里的future_bar_10min表，该表存放了期货10分钟的 Bar 行情数据。关于数据库 API 的详细说明，参见说明文档[数据库](3_接口说明/数据库/DatabaseAPI.md)部分，关于 DataApi 的详细说明，参见说明文档[DataApi](3_接口说明/数据模型/set_model_view.md) 部分。
 
 - Matrix 引擎的订单撮合器
 ```text
@@ -159,7 +159,7 @@ matrix:
 -  当委托买单（卖单）价格大于当前 Bar 的收盘价时，订单全部成交，否则调整为挂单，等待下一个 Bar 继续撮合；
 -  若到收盘时委托单依旧未成交，则取消该委托单。
 
-k 线撮合器是系统所支持的一种常用的撮合器，此外，系统还支持 日频 / 快照 与 Orderflow 撮合成交。开发者可根据特定场景开发自己的撮合器，只需要重载撮合器基类 Matcher的几个方法即可实现。撮合器的具体说明参见[这里]。
+k 线撮合器是系统所支持的一种常用的撮合器，此外，系统还支持 日频 / 快照 与 Orderflow 撮合成交。开发者可根据特定场景开发自己的撮合器，只需要重载撮合器基类 Matcher的几个方法即可实现。撮合器的具体说明参见[这里](4_其他组件/market_components.md)。
 
 
 - 策略的账户类型
@@ -248,7 +248,7 @@ class DoubleMaStrategy(Strategy):
                     self.sell(close[-1], 1, 'open', code, 'stock')
 ```
 
-策略继承自 Strategy 类，所有的回测策略，都要继承该类，以实现自身的策略逻辑。关于策略组件基类 Strategy 的详细说明，参见[这里]。
+策略继承自 Strategy 类，所有的回测策略，都要继承该类，以实现自身的策略逻辑。关于策略组件基类 Strategy 的详细说明，参见[这里](3_接口说明/策略/strategy.md)。
 
 DoubleMaStrategy 类的 init 方法，会在组件初始化时调用。这里，它从 config 属性中获取了 2 个参数，用于设定快慢均线的计算窗口。这 2 个外部参数配置在 yaml 文件的 strategy 部分，参见 2.1.2 节。
 
@@ -386,7 +386,7 @@ class TestEval(Evaluator):
 
 这里，我们在 init 方法中订阅了demo数据库里的stock_index表的品种，000300.SH，并且取用了表的字段 close，实际对应的数据是沪深300指数的收盘价。我们以它作为基准，在 critic 方法中获取策略每日的pnl，计算了策略收益、基准收益和超额收益等指标，通过 show 方法将这些计算结果绘制展示出来。
 
-关于 评价组件基类 Evaluator 的详细说明，参见[这里]。
+关于 评价组件基类 Evaluator 的详细说明，参见[这里](3_接口说明/评价/evaluator.md)。
 
 ### 2.4 运行策略程序
 
@@ -607,7 +607,7 @@ matrix.eval() # 对回测结果作评价
 
 ### 2.6 其他策略支持
 
-前文我们以一个期货 CTA 策略和一个股票 CTA 策略为示例，详细介绍了如何使用 TransMatrix 系统开展策略研究。事实上，TransMatrix 支持各种类型的策略回测，包括但不限于：股票 T0、期货做市、ETF 套利、可转债高频等等。系统也提供了不同类型的策略示例，参见[这里]。
+前文我们以一个期货 CTA 策略和一个股票 CTA 策略为示例，详细介绍了如何使用 TransMatrix 系统开展策略研究。事实上，TransMatrix 支持各种类型的策略回测，包括但不限于：股票 T0、期货做市、ETF 套利、可转债高频等等。系统也提供了不同类型的策略示例，参见[这里](8_测例代码/index.md)。
 <div align=center>
 <img width="500" src="TransMatrix使用手册/pics/sim_demo.png"/>
 </div>

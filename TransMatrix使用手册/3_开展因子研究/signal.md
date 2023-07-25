@@ -46,7 +46,7 @@ strategy: # 因子数据的计算逻辑写在哪里？
 
 由于我们只需要计算因子数据，而不作因子评价，故不需要配置评价组件。
 
-在 matrix 部分的配置，我们将研究模式设为 signal，代表是因子研究模式，计算区间是2018年1月1日到2021年12月30日。因子计算的样本空间是中证500，它是一个动态的股票池，由 meta_data 库的 critic_data 表的 is_zz500字段给定，它的取值为0或1，若为1则股票在当前截面属于中证500。关于code 和 universe 的配置的更多说明，参见[这里]。
+在 matrix 部分的配置，我们将研究模式设为 signal，代表是因子研究模式，计算区间是2018年1月1日到2021年12月30日。因子计算的样本空间是中证500，它是一个动态的股票池，由 meta_data 库的 critic_data 表的 is_zz500字段给定，它的取值为0或1，若为1则股票在当前截面属于中证500。关于code 和 universe 的配置的更多说明，参见[这里](3_接口说明/Matrix/matrix.md)。
 
 在 strategy 部分的配置，我们的因子计算逻辑，写在 strategy.py 文件的 ReverseSignal 类中。
 
@@ -82,7 +82,7 @@ class ReverseSignal(SignalStrategy):
         self.update_signal(self.reverse.get('reverse'))
 ```
 
-上述代码中，我们定义了一个 ReverseSignal 类，它继承自 SignalStrategy。SignalStrategy 是系统因子计算的基类，因子计算类都要继承它。关于 SignalStrategy 的详细说明，参见[这里]。
+上述代码中，我们定义了一个 ReverseSignal 类，它继承自 SignalStrategy。SignalStrategy 是系统因子计算的基类，因子计算类都要继承它。关于 SignalStrategy 的详细说明，参见[这里](5_定制化模块_截面因子开发/signal.md)。
 
 ReverseSignal 类重载了以下 3 个方法：
 - init 方法，初始化因子计算组件时将调用本方法。这里添加了一个因子更新定时调度器，时间设置为 8:30，代表每个交易日的 8:30 会触发调度器调用 on_clock 方法。另外，还订阅了股票的日线行情数据（来源于demo库的stock_bar_1day表，字段是高开低收，筛选的股票与 Matrix 引擎配置的样本空间一样，即中证500）。
@@ -115,7 +115,7 @@ strategy.signal.to_dataframe()
 <div align=center style="font-size:12px">因子数据</div>
 <br />
 
-注意，这里的 strategy 对象的 signal 属性，是一个 DataView2d，而 strategy 对象订阅的行情数据 pv，它是一个 DataView3d 类型。DataView3d 是一个 3d 数据视图，针对 Data3d 提供了诸多的数据查询接口；DataView2d 是一个 2d 数据视图，针对 Data2d 提供了数据查询接口。关于 Data3d, Data2d, DataView2d, DataView3d 等类的详细说明，参照[这里]。
+注意，这里的 strategy 对象的 signal 属性，是一个 DataView2d，而 strategy 对象订阅的行情数据 pv，它是一个 DataView3d 类型。DataView3d 是一个 3d 数据视图，针对 Data3d 提供了诸多的数据查询接口；DataView2d 是一个 2d 数据视图，针对 Data2d 提供了数据查询接口。关于 Data3d, Data2d, DataView2d, DataView3d 等类的详细说明，参见[这里](3_接口说明/数据模型/set_model_view.md)。
 ```python
 print(strategy.signal)
 print(strategy.pv)
@@ -187,7 +187,7 @@ SimpleEvaluator 继承自基类 SignalEvaluator。所有因子评价组件都要
 - show 方法，用于展示因子评价结果。这里我们将计算得到的每日 IC 值绘制成线图。
 - regist 方法，若要将因子注册到 TransQuant 策略面板，则需要重载本方法。这里跳过。
 
-关于 SignalEvaluator 基类的更多说明，参见[这里]。
+关于 SignalEvaluator 基类的更多说明，参见[这里](5_定制化模块_截面因子开发/signal.md)。
 
 我们再次运行 run.ipynb 里的单元格，得到以下输出：
 <div align=center>
@@ -196,7 +196,7 @@ SimpleEvaluator 继承自基类 SignalEvaluator。所有因子评价组件都要
 <div align=center style="font-size:12px">因子评价</div>
 <br />
 
-以上便完成了 3.1 节的反转因子的评价，出于演示目的，这里仅计算并展示了因子的 IC 值，用户可以添加更多的逻辑，以实现诸如分组分析、回归分析、换手率分析、相关性分析等单因子分析的内容。系统也附带提供了多套因子评价模板，参见[因子服务-评价模板]。
+以上便完成了 3.1 节的反转因子的评价，出于演示目的，这里仅计算并展示了因子的 IC 值，用户可以添加更多的逻辑，以实现诸如分组分析、回归分析、换手率分析、相关性分析等单因子分析的内容。系统也附带提供了多套因子评价模板，参见[因子服务-评价模板](8_测例代码/因子服务-评价模板.md)。
 
 ### 3.3 保存因子数据
 
@@ -233,7 +233,7 @@ Out:
 
 ### 3.4 定时更新因子数据
 
-假设计算得到的因子数据，通过了因子评价检验，需要每日增量更新因子数据，应该如何实现？只需要打开系统提供的定时任务模块，通过配置定时更新因子数据的调度任务，即可实现。更多介绍，参见 TransQuant 的[定时任务]。
+假设计算得到的因子数据，通过了因子评价检验，需要每日增量更新因子数据，应该如何实现？只需要打开系统提供的定时任务模块，通过配置定时更新因子数据的调度任务，即可实现。更多介绍，参见 TransQuant 的[定时任务](http://xiewenqing1989.gitee.io/transquantproductdoc.github.io/#/README?id=_252-%e5%ae%9a%e6%97%b6%e4%bb%bb%e5%8a%a1)。
 
 ### 3.5 一个完整的股票多因子策略示例
 

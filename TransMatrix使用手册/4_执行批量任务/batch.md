@@ -112,7 +112,7 @@ create_factor_table(temp_table_name) # 创建因子表
 from transmatrix.workflow.run_batch import run_matrices
 run_matrices('task_flow.yaml') # 运行批量任务
 ```
-代码里，我们在个人空间新建了 1 张因子数据表，然后调用 run_matrices 方法执行批量任务。关于 run_matrices 方法的详细说明，参见[这里]。运行该单元格，输出以下内容：
+代码里，我们在个人空间新建了 1 张因子数据表，然后调用 run_matrices 方法执行批量任务。关于 run_matrices 方法的详细说明，参见[这里](9_workflow/batch.md)。运行该单元格，输出以下内容：
 ```text
 Out:
     2023-06-19 15:38:20.326217: 批量任务开始:
