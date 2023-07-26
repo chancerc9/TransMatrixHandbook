@@ -4,13 +4,13 @@
 
 - 本模块支持哪些参数类型和优化算法？
 
-    本模块支持的参数类型包括**Sequence**，**Box**，**Discrete**，**Category**和**Bool**，其中不同的优化算法支持的参数有所不同。
+    本模块支持的参数类型包括 **Sequence**，**Box**，**Discrete**，**Category** 和 **Bool**，其中不同的优化算法支持的参数有所不同。
 
-    本模块实现的优化算法包括**网格搜索** **gridsearch**，**随机搜索** **randomsearch**，**贝叶斯搜索** **bayessearch**，**强化随机搜索** **ARS**和**遗传算法** **GA**。除此以外，为了使得优化算法的使用更灵活，本模块还支持**早停法 earlystopping**。
+    本模块实现的优化算法包括**网格搜索** **gridsearch**，**随机搜索** **randomsearch**，**贝叶斯搜索** **bayessearch**，**强化随机搜索** **ARS** 和**遗传算法** **GA**。除此以外，为了使得优化算法的使用更灵活，本模块还支持**早停法 earlystopping**。
 
 > Tips:
 >
-> 关于参数类型和优化算法更详细的说明，请参考[参数优化说明（API文档版）](。。。)。
+> 关于参数类型和优化算法更详细的说明，请参考[参数优化说明（API文档版）](9_workflow/optim.md)。
 
 
 
@@ -33,7 +33,7 @@
 >
 > **self.param 是一个字典**，key 为参数的名字，value 为参数的值。
 >
-> 需要注意的是，数值型的参数在 self.param 都会被储存为 float 类型，可以通过 int() 获得正确的参数类型。
+> 需要注意的是，数值型的参数在 self.param 都会被储存为 float 类型，可以通过 init() 获得正确的参数类型。
 
 
 
@@ -80,7 +80,7 @@ class TestStra(Strategy):
 
 - evaluator.py
 
-    简单地将策略的总pnl作为优化的目标函数值。
+    简单地将策略的总 pnl 作为优化的目标函数值。
 
 ```python
 from transmatrix.evaluator.simulation import SimulationEvaluator
@@ -174,13 +174,13 @@ def vec_rankIC(factor_panel: pd.DataFrame, ret_panel: pd.DataFrame):
 
 ### 6.2 如何配置yaml文件
 
-和标准的因子研究和策略研究类似，同样需要在config.yaml中配置matrix、strategy和evaluator字段。
+和标准的因子研究和策略研究类似，同样需要在 config.yaml 中配置 matrix、strategy 和 evaluator 字段。
 
-不同的是，额外需要配置一个**OptimMatrix**字段。
+不同的是，额外需要配置一个 **OptimMatrix** 字段。
 
 > Tips：
 >
-> 关于OptimMatrix更详细的配置说明（包括其他优化算法的配置方法和参数类型等），请参考[参数优化说明（API文档版）](path)。
+> 关于 OptimMatrix 更详细的配置说明（包括其他优化算法的配置方法和参数类型等），请参考[参数优化说明（API文档版）](9_workflow/optim.md)。
 
 
 
@@ -189,7 +189,7 @@ def vec_rankIC(factor_panel: pd.DataFrame, ret_panel: pd.DataFrame):
     下面的 `window_size:  [[1,5,1], 'Sequence']` 的含义是：
 
     - 待优化的参数的名称为 window_size；
-    - 参数空间设置为 [1,5,1]，参数空间的类型是'Sequence'，意思是参数空间为  np.arange(1, 5, 1)；
+    - 参数空间设置为 [1,5,1]，参数空间的类型是 'Sequence'，意思是参数空间为  np.arange(1, 5, 1)；
     - 因此参数的备选值为 1、2、3、4。
 
 ```yaml
@@ -305,7 +305,7 @@ result_df = run_optim_matrix('config.yaml')
 
 ### 6.4 如何使用早停法 Earlystopping
 
-早停法的使用很简单，仅需在OptimMatrix里添加早停法的配置即可。
+早停法的使用很简单，仅需在 OptimMatrix 里添加早停法的配置即可。
 
 ```yaml
 OptimMatrix:
