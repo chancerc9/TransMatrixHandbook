@@ -90,7 +90,7 @@ TransMatrix 是一个高度自定义化的量化投研框架，可以帮助用�
 
   首先，我们同样在int中订阅数据，然后在critic中计算IC值。
 
-- 关于如何使用配置文件将因子全流程串联和运行起来，详见[配置文件说明](https://transquant.github.io/TransMatrixAPI.github.io/#/6_%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE/configer)。
+- 关于如何使用配置文件将因子全流程串联和运行起来，详见接下来的[三、开展因子研究](TransMatrix使用手册/3_开展因子研究/signal.md)部分。
 
 
 
@@ -166,4 +166,4 @@ TransMatrix 是一个高度自定义化的量化投研框架，可以帮助用�
 
   首先，我们在critic方法中通过self.get_pnl()获得策略运行结果的每日损益，并通过加和获得总pnl。
 
-- 关于如何使用配置文件将因子全流程串联和运行起来，详见[配置文件说明](https://transquant.github.io/TransMatrixAPI.github.io/#/6_%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE/configer)。
+- 关于如何使用配置文件将因子全流程串联和运行起来，详见接下来的[二、开展策略研究](TransMatrix使用手册/2_开展策略研究/simulation.md)。
