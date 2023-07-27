@@ -31,10 +31,10 @@
 ```text
 matrix:
     mode: signal # 研究模式为因子研究
-    span: [2018-01-01, 2021-12-30] # 因子计算区间
-    codes: '*'
+    span: [2018-01-01, 2021-12-30] # 我打算生成哪一段时间区间的因子？
+    codes: '*' 
     universe: [meta_data, critic_data, is_zz500] # 因子在截面上包含哪些股票？
-    save_signal: False # 是否保存因子到指定表
+    save_signal: False # 因子数据保存到哪里？
 
 strategy: # 因子数据的计算逻辑写在哪里？
     reverse_factor:
@@ -136,10 +136,10 @@ Out:
 ```text
 matrix:
     mode: signal # 研究模式为因子研究
-    span: [2018-01-01, 2021-12-30] # 因子计算区间
+    span: [2018-01-01, 2021-12-30] # 我打算生成哪一段时间区间的因子？
     codes: '*'
     universe: [meta_data, critic_data, is_zz500] # 因子在截面上包含哪些股票？
-    save_signal: False # 是否保存因子到指定表
+    save_signal: False # 因子数据保存到哪里？
 
 strategy: # 因子数据的计算逻辑写在哪里？
     reverse_factor:
@@ -147,7 +147,7 @@ strategy: # 因子数据的计算逻辑写在哪里？
             - strategy.py 
             - ReverseSignal
 
-evaluator: # 如何评价因子
+evaluator: # 有了因子数据后，如何做单因子分析，分析结果怎么可视化？
     SimpleEval:
         class:
             - evaluator.py

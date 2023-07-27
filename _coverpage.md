@@ -1,6 +1,7 @@
 [//]: # (<--_coverpage.md-->)
 ![](data.svg ':size=200x200')
-# TransMatrix 产品手册
+# TransQuant 产品手册
 
-[使用手册](TransMatrix使用手册/README.md)
-[API文档](README.md)
+[TransMatrix 使用手册](TransMatrix使用手册/README.md)
+[TransMatrix API文档](README.md)
+[TransQuant 使用手册](http://xiewenqing1989.gitee.io/transquantproductdoc.github.io)
