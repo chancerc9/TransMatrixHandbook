@@ -19,8 +19,8 @@
 ---
 
 - 1.0.2
-  - 数据模型功能优化：支持 DataView3d 以索引的形式获取 DataView2d。
-  - Api微调：SignalStrategy.factor_data 由原有的 DataView3d 改为 Dict[str, DataView2d] 
+  - 1.数据模型功能优化：支持 DataView3d 以索引的形式获取 DataView2d。
+  - 2.Api微调：SignalStrategy.factor_data 由原有的 DataView3d 改为 Dict[str, DataView2d] 
     - 受影响的测例 (模板已更新)
       - 因子服务-因子分析，
       - 因子服务-评价模板，
@@ -30,5 +30,10 @@
       - transmatrix 特色功能-数据获取，
 
 ---
-
-  
+- 1.0.3
+  - 1.Market 配置扩展支持长度为 2（或3）的列表
+  - 2.期货账户功能完善，期货结算机制完善
+  - 3.DataView3d 方法扩展，添加 loc, loc_code, query_code 等方法
+  - 4.添加新的测例：
+    - 策略服务-回测场景支持-期货分钟频
+    - transmatrix特色功能-参数优化-optim

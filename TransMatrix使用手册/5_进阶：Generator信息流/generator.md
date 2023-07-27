@@ -102,7 +102,7 @@ class Trade(Strategy):
                 )
 ```
 
-上述代码里，我们定义了 2 个继承自 Generator 的类：GenVolumeBar 类用于生成 Volume Bar，GenPriceBar 类用于生成Price Bar。Trade 类用于接收前 2 个类的消息，便据此构建买卖逻辑。针对 GenVolumeBar 类：
+上述代码里，我们定义了 2 个继承自 Generator 的类：GenVolumeBar 类用于生成 Volume Bar，GenPriceBar 类用于生成 Price Bar。Trade 类用于接收前 2 个类的消息，便据此构建买卖逻辑。针对 GenVolumeBar 类：
 -   init 方法中注册了一个名为 volume_bar 的信息流
 -   on_tick 方法每个快照都会被回调一次，当前快照的成交量大于 1000 时，广播数据
 
