@@ -169,3 +169,16 @@ Out:
 ```
 
 由输出结果可知，系统顺序执行了 2 个批任务，每个批任务内的子任务是并行执行的。
+
+> Tips:
+> 
+> 系统支持 **2 种运行方式**，执行批量任务：
+> 
+> - **run_matrices** 方法: 在 py 文件或 jupyter 环境中调用本方法
+> - **BatchMatrix** 命令：在命令行窗口中输入 BatchMatrix -p [yaml_path] -s [startdate]-[enddate]
+>       我们在命令行窗口中输入以下命令： 
+> 
+>       BatchMatrix -p /root/workspace/我的项目/批量任务-workflow/3.workflow.yaml -s 20210101-20211230 
+>
+>       系统将运行配置信息文件： "/root/workspace/我的项目/批量任务-workflow/3.workflow.yaml"，并且回测时间段为 2021年1月1日到2021年12月30日
+

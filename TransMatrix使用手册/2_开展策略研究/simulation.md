@@ -254,6 +254,17 @@ DoubleMaStrategy 类的 init 方法，会在组件初始化时调用。这里，
 
 我们重载了 on_market_data_update 方法，该方法在 Matrix 订阅的行情数据有更新时会被执行。这里，由于我们订阅的是日线数据，故每个交易日收盘时，都会执行一次本方法。我们在该方法里实现了 2.1 节所给出的双均线策略逻辑。
 
+> Tips:
+> 
+> 策略组件内置支持了许多回调方法，用户可以重载这些方法，以实现自己的逻辑：
+> -   on_market_open: 每日开盘时将回调本方法
+> -   on_market_close: 每日收盘时将回调本方法
+> -   on_market_data_update: 行情数据有更新时，将回调本方法。若行情数据频率是日频的，则每个交易日会回调本方法；若行情数据是 5 分钟频率的，则每 5 分钟会回调本方法，依此类推
+> -   on_trade: 有订单成交时将回调本方法
+> -   on_receive: 账户收到订单时将回调本方法
+> 
+> 用户也可以添加调度器，实现自定义的回调需求，调度器的更多说明，参见[这里](TransMatrix使用手册/2_开展策略研究/simulation.md?id=_25-一个股票策略示例)。
+
 
 ### 2.3 实现评价组件
 
@@ -415,6 +426,20 @@ mat = run_matrix('config.yaml')
 <br />
 
 对照 run_matrix 方法背后实现的5个步骤，结合上面的运行结果，便能完整理解整个策略的流程。 
+ 
+> Tips:
+>
+> 系统支持 **2 种运行方式**，执行策略回测：
+> -   **run_matrix** 方法: 在 py 文件或 jupyter 环境中调用本方法
+> -   **Matrix** 命令： 在命令行窗口中输入 Matrix -p [yaml_path] -s [startdate]-[enddate]
+>       我们在命令行窗口中输入以下命令： 
+> 
+>       Matrix -p /root/workspace/我的项目/研究全流程/1.因子计算与入库/config.yaml -s 20210101-20211230 
+>
+>       系统将运行配置信息文件： "/root/workspace/我的项目/研究全流程/1.因子计算与入库/config.yaml"，并且回测时间段为 2021年1月1日到2021年12月30日
+
+    
+
 
 我们再新建一个代码单元格，查看策略所有的历史交易记录。
 
@@ -436,6 +461,7 @@ strategy.get_trade_table()
 
 2.1 节提到，TransMatrix 系统可支持2种配置方式，一是将配置信息写在 yaml 文件里，二是将配置信息写到字典 (dict) 对象 。这里，我们采用第二种配置方式，一步步地实现一个简单的股票策略。
 
+#### 2.5.1 策略实现
 策略逻辑很简单：从自定义的股票样本空间中，每日选出 macd 值最小的2只股票，若股票已有持仓不超过300股，则进行买入，否则跳过。
 
 首先，与前面的期货策略示例一样，我们要先配置回测信息。这次，配置信息写在字典对象里。我们新建一个 ipynb 文件，命名为 stock_strategy.ipynb。
@@ -526,8 +552,52 @@ class MacdStrategy(Strategy):
 
 另外，init 方法还添加了一个定时调度器 (FixTimeScheduler)，它在每个交易日的下午14点，都会调用 callback_on_14 方法，callback_on_14 实现了策略的具体交易逻辑。
 
-除了定时调度器，系统也支持定频调度器 (FixFreqScheduler)、外部导入调度器 (ExternalTimeScheduler)、跟随数据调度器 (DataClock) 以及周期调度器 (PeriodScheduler)，这些调度器可以满足策略各种不同的回调需求。此外，用户也可以重载 调度器基类 BaseScheduler, 以实现自定义的回调规则。调度器的更多说明，参见[这里]。
+#### 2.5.2 调度器说明
+系统内置支持以下调度器，这些调度器可以满足策略各种不同的回调需求：
+- 定时调度器：**FixTimeScheduler**，指定一个时间，定时触发回调方法。
+```python
+    # 指定每个交易日的 14 点，触发用户自定义的 callback_on_14 方法
+    self.add_scheduler(milestones = ['14:00:00'], handler = self.callback_on_14)
+```
+- 定频调度器：**FixFreqScheduler**
+```python
+    # 指定每隔 1 小时，触发回调方法 callback
+    from transmatrix.common.scheduler import FixFreqScheduler
+    scheduler = FixFreqScheduler(freq = '60m')
+    self.add_scheduler(scheduler = scheduler, handler = self.callback)
+```
+- 外部导入调度器：**ExternalTimeScheduler**
+```python
+    # 外部导入回调时间，触发回调方法 callback
+    from transmatrix.common.scheduler import ExternalTimeScheduler
+    date_list = [datetime(2023,1, 3, 10), datetime(2023,1, 4, 10), datetime(2023,1, 5, 10)]
+    scheduler = ExternalTimeScheduler(external_steps = date_list)
+    self.add_scheduler(scheduler = scheduler, handler = self.callback)
+```
 
+- 跟随数据调度器：**DataClock**
+```python
+    # 添加跟随订阅数据 pv_5min 的调度器，调度时间列表与订阅时间一致。这里，每 5 分钟会调用 callback 方法
+    self.subscribe_data(
+        'pv_5min', ['demo','stock_bar_5min', self.codes, 'open,high,low,close', 0]
+    )
+    self.add_scheduler(with_data='pv_5min', handler = self.callback)
+```
+
+- 周期调度器：**PeriodScheduler**
+
+  按照一定周期触发，支持频率：W: 每周结束， WS: 每周开始， W-MON:周一，W-TUE:周二，W-WED:周三，W-THU:周四，W-FRI:周五，M:每月末，SM:15号或月末，MS:每月初，Q:每季度末，QS:每季度初
+```python
+    # 每周一的10点回调 callback 方法
+    from transmatrix.common.scheduler import PeriodScheduler
+    scheduler = PeriodScheduler('W-MON','10:00:00')
+    scheduler.add_span(['2023-01-01','2023-05-18'])
+    self.add_scheduler(scheduler = scheduler, handler = self.callback)
+```
+
+此外，用户也可以重载 调度器基类 BaseScheduler, 以实现自定义的回调规则。
+
+#### 2.5.3 运行策略
 评价组件写在了 evaluator.py 文件中，它的代码如下：
 ```python
 from transmatrix import Evaluator
