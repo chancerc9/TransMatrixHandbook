@@ -599,7 +599,7 @@ class MacdStrategy(Strategy):
     self.add_scheduler(scheduler = scheduler, handler = self.callback)
 ```
 
-此外，用户也可以重载 调度器基类 BaseScheduler, 以实现自定义的回调规则。此时，需要 gen_steps 方法，以生成实例的 steps 属性，系统将依照该 steps 列表来执行回调操作。
+此外，用户也可以重载 调度器基类 BaseScheduler, 以实现自定义的回调规则。此时，需要重载实现 gen_steps 方法，以生成实例的 steps 属性，系统将依照该 steps 列表来执行回调操作。
 
 #### 2.5.3 运行策略
 评价组件写在了 evaluator.py 文件中，它的代码如下：
