@@ -560,10 +560,14 @@ class MacdStrategy(Strategy):
     self.add_scheduler(milestones = ['14:00:00'], handler = self.callback_on_14)
 ```
 - 定频调度器：**FixFreqScheduler**
+  -   需要提供 freq 参数，该参数的支持的格式，可以参照 pandas 的 to_timedelta 方法。
+  -   freq 不能大于一小时。
+
 ```python
     # 指定每隔 1 小时，触发回调方法 callback
     from transmatrix.common.scheduler import FixFreqScheduler
-    scheduler = FixFreqScheduler(freq = '60m')
+    scheduler = FixFreqScheduler(freq = '60m') # 回调频率为 60 分钟一次
+    scheduler.add_span([self.matrix.start, self.matrix.end])
     self.add_scheduler(scheduler = scheduler, handler = self.callback)
 ```
 - 外部导入调度器：**ExternalTimeScheduler**
@@ -595,7 +599,7 @@ class MacdStrategy(Strategy):
     self.add_scheduler(scheduler = scheduler, handler = self.callback)
 ```
 
-此外，用户也可以重载 调度器基类 BaseScheduler, 以实现自定义的回调规则。
+此外，用户也可以重载 调度器基类 BaseScheduler, 以实现自定义的回调规则。此时，需要 gen_steps 方法，以生成实例的 steps 属性，系统将依照该 steps 列表来执行回调操作。
 
 #### 2.5.3 运行策略
 评价组件写在了 evaluator.py 文件中，它的代码如下：
