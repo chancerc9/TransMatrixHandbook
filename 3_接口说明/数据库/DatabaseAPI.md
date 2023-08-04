@@ -268,6 +268,16 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
         'trade_calendar']
       ```
 
+
+  - <b>close_connection</b> 
+    - <b>功能</b>：关闭数据库连接
+    - <b>参数</b>:
+      无
+      
+    - <b>返回值</b>：
+      无
+
+
   - <b>show_columns</b> 
     - <b>功能</b>：显示表列名
     - <b>参数</b>:
@@ -817,7 +827,7 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
     ```
 
   - get_column_info_from_df 
-    - <b>功能</b>：从dataframe中获取列信息
+    - <b>功能</b>：类方法，从dataframe中获取列信息
     - <b>参数</b>：
     > 名称|类型|说明
     >----|----|----
