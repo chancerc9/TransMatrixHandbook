@@ -21,7 +21,7 @@
       - Dict:
         - data (List): [`db_name`,`table_name`]
         - matcher (str, Optional): daily/bar / tick或orderflow指定撮合器（若不提供则根据 table_name 推断）。
-        - account (str): base / detail，base为基础账户，不做验资验券；detail账户将根据市场属性进行验资验券。 若不提供改字段，则采用 detail模式。
+        - account (str): base / detail，base为基础账户，不做验资验券；detail账户将根据市场属性进行验资验券。 若不提供该字段，则采用 detail模式。
 - 可选参数:
   - fee_rate (float): defaults to 0.
   - ini_cash (float): defaults to 10000000.
