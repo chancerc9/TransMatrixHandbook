@@ -348,7 +348,7 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
       ```python
       In:
         #查询数据库
-        db.execute_sql('show database')
+        db.execute_sql('show databases')
       ```
       ```text
       Out:
@@ -571,7 +571,7 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
 
     ```python
     In:
-      db.delete_row('orc_test',condition={'field':'code'})
+      db.delete_row('orc_test',condition={'code':'000001.SZ'})
     ```
 
   - <b>update_row</b> 
@@ -588,7 +588,7 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
 
     ```python
     In:
-      db.update_row('orc_test',column_map={'explain':'test update'},condition={'field':'datetime'})
+      db.update_row('orc_test',column_map={'industry':'银行'},condition={'code':'000001.SZ'})
     ```
 
   - <b>insert_values</b> 
@@ -690,9 +690,9 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
     ---
     ```python
     In:
-      #指定其他查询条件,收盘价在18和19之间
+      #指定其他查询条件, vwap 价在18和19之间
       df = db.query('stock_bar_daily',start='2019-10-01',end='2019-10-15',fields='close,vwap',universe='000004.SZ,000065.SZ',
-      other_condition={'close':(18,19)})
+      other_condition={'vwap':(18,19)})
     ```
     ```text
     Out:
@@ -706,29 +706,29 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
     ---
     ```python
     In:
-      #指定其他查询条件,收盘价取18.83,8.66,8.64,8.61
+      #指定其他查询条件, vwap 价取 18.900,18.692,18.881
       df = db.query('stock_bar_daily',start='2019-10-01',end='2019-10-15',fields='close,vwap',universe='000004.SZ,000065.SZ',
-      other_condition={'close':[18.83,8.66,8.64,8.61]})
+      other_condition={'vwap':[18.900,18.692,18.881]})
+      df
     ```
     ```text
     Out:
-        close    vwap       code            datetime
-      0  18.83  18.900  000004.SZ 2019-10-08 15:00:00
-      1   8.64   8.639  000065.SZ 2019-10-10 15:00:00
-      2   8.61   8.576  000065.SZ 2019-10-11 15:00:00
-      3   8.66   8.691  000065.SZ 2019-10-15 15:00:00
+      close	vwap	code	datetime
+      0	18.83	18.900	000004.SZ	2019-10-08 15:00:00
+      1	18.73	18.692	000004.SZ	2019-10-09 15:00:00
+      2	18.94	18.881	000004.SZ	2019-10-10 15:00:00
     ```
     ---
     ```python
     In:
-      #指定其他查询条件,收盘价等于8.60
+      #指定其他查询条件, vwap 价等于 18.90
       df = db.query('stock_bar_daily',start='2019-10-01',end='2019-10-15',fields='close,vwap',universe='000004.SZ,000065.SZ',
-      other_condition={'close':8.60})
+      other_condition={'vwap':18.90})
     ```
     ```text
     Out:
-        close   vwap       code            datetime
-      0    8.6  8.513  000065.SZ 2019-10-09 15:00:00
+      close	vwap	code	datetime
+      0	18.83	18.9	000004.SZ	2019-10-08 15:00:00
     ```  
 
   - <b>query_raw</b> 
@@ -821,8 +821,9 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
     ```python
     In:
       import pandas as pd
+      from datetime import datetime
       from transmatrix.data_api import save_factor
-      df = pd.DataFrame(data=[['2022-01-01','000001.SZ',0.1],['2022-01-02','000001.SZ',0.2]],columns=['datetime','code','value'])
+      df = pd.DataFrame(data=[[datetime(2022,1,1),'000001.SZ',0.1],[datetime(2022,1,2),'000001.SZ',0.2]],columns=['datetime','code','fvalue'])
       save_factor('factor_test_table', data=df)
     ```
 
@@ -839,9 +840,10 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
     ```python
     In:
       import pandas as pd
-      from transmatrix.data_api import get_column_info_from_df
+      from transmatrix.data_api import Database
+      db = Database('meta_data')
       df = pd.DataFrame(data=[['2022-01-01','000001.SZ',0.1],['2022-01-02','000001.SZ',0.2]],columns=['datetime','code','value'])
-      columns = get_column_info_from_df(df)
+      columns = db.get_column_info_from_df(df)
       print(columns)
     
     Out:
