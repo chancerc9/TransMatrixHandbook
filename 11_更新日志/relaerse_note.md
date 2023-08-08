@@ -37,3 +37,8 @@
   - 4.添加新的测例：
     - 策略服务-回测场景支持-期货分钟频
     - transmatrix特色功能-参数优化-optim
+  
+  - 5.本地文件系统优化： 支持按照 code * span 做数据分片（用于存储 tick 数据）
+  - 6.增加 on_order_response 回调，在订单状态改变时(委托/成交/撤单等）触发（原有的 on_receive 和  on_trade 保留）
+  
+  
