@@ -35,10 +35,28 @@ Strategy 是 [Generator](3_接口说明/策略/generator.md) 的子类，可实�
 - <b> on_market_open(`market_name`)  </b>  每日开盘时的用户操作（对应 Matrix 配置信息中 market 下的字段名）
 - <b> on_market_data_update([data]())</b>  市场数据更新时的用户操作
 - <b> on_market_close(`market_name`) </b>  每日收盘时的用户操作（对应 Matrix 配置信息中 market 下的字段名）
-- <b> on_trade([trade]()) </b> 成交时的用户操作
+- **on_receive([order](4_其他组件/market_components.md))** 账户收到订单时的用户操作
+- <b> on_trade([order](4_其他组件/market_components.md)) </b> 订单成交时的用户操作
 - <b>on_order_response([order](4_其他组件/market_components.md))</b>  订单状态改变时(委托/成交/撤单等）触发的用户操作
 
+```python
+# def on_trade(self, order: Order):
+# def on_receive(self, order: Order):
+def on_order_response(self, order: Order):
+	print('--'*20)
+    print('当前时间', self.time)
+    print('委托编号', order.id)
+    print('委托时间', order.insert_time)
+    print('委托价格', order.price)
+    print('委托方向', order.direction)
+    print('委托数量', order.volume)
+    print('未成交量', order.pending_volume)
+    print('委托状态', order.status)
+    print('--'*20)
+```
+
 <b> 自定义回调 </b>
+
 - 通过 [add_scheduler](3_接口说明/策略/generator.md#add_scheduler) 注册的回调
 - 通过 [callback](3_接口说明/策略/generator.md#generator-间的信息传递) 注册的回调
 
