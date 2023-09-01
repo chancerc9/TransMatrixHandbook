@@ -617,20 +617,18 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
       >名称|类型|说明
       >----|----|----
       table_name|String|数据表名
-      query|String|sql查询语句，使用query传入sql查询语句默认返回Dataframe。
+      query|String|sql查询语句，使用query传入sql查询语句默认返回Dataframe。此时将忽略 fields、universe、start 和 end 等参数设置。 **使用 query 参数传入sql查询语句时，不支持较复杂的联表查询**
       fields|List/String|字段名
       start|String/date/datetime|查询起始时间
       end|String/date/datetime|查询截止时间
       universe|String/List|查询代码
-      raw|bool|默认为False,raw为True时使用HTTP接口传输数据,不建议选择
+      raw|bool|默认为 False，raw 为 True 时使用 HTTP 接口传输数据。**最佳实践：基于效率考虑，请将本参数设为 False**
       other_condition|Dict|其他筛选条件,{<字段>:<条件>}<br>条件可以为单值,tuple,list<br>分别表示取单值,取值范围(闭区间),取多值
       size|Integer|返回记录条数
       return_type|String|取值为 "list"(返回列表) 或 "dataframe"(返回pandas.DataFrame),该参数只在raw为True时有效,否则默认返回Dataframe
 
     - <b>返回值</b>：
       用列表或DataFrame盛放的数据
-    
-    可以直接传入sql查询语句，但是不支持较复杂的联表查询。
 
     ```python
     In:
@@ -739,10 +737,30 @@ TransMatrix 的默认使用 Timelyre 分布式时序数据库。
     table_name|String|查询表名
     fields|List/String|查询字段
     condition|Dict|查询条件，{<字段>:<条件>}，方式同query方法
-    raw|bool|默认为False，使用query_as_df函数，否则用query_raw函数
+    query|String|sql查询语句，使用query传入sql查询语句默认返回Dataframe，此时将忽略 fields 和 condition 的参数设置。**使用 query 参数传入sql查询语句时，不支持较复杂的联表查询**
+    raw|bool|默认为 False，raw 为 True 时使用 HTTP 接口传输数据。**最佳实践：基于效率考虑，请将本参数设为 False**
 
     - <b>返回值</b>：
       用列表或DataFrame盛放的数据
+
+**query 与 query_raw 接口对比**：
+- 当使用 query 参数传入 sql 语句时，二者效果一样
+```python
+In:
+  from transmatrix.data_api import Database
+  db = Database('demo')
+  db.query(query='select * from stock_bar_1day limit 3')
+```
+```text
+Out:
+  	code	datetime	trade_day	open	high	low	close	volume	turnover	vwap	factor	limit_up	limit_down
+0	000021.SZ	2010-01-04 15:00:00	2010-01-04	13.03	13.17	12.85	13.10	11719208	152797936.0	13.04	9.575	14.18	11.60
+1	000021.SZ	2010-01-05 15:00:00	2010-01-05	13.06	13.70	12.95	13.40	20586248	276690912.0	13.44	9.575	14.41	11.79
+2	000021.SZ	2010-01-06 15:00:00	2010-01-06	13.40	13.86	13.31	13.31	17038522	232215682.0	13.63	9.575	14.74	12.06
+```
+- 当不使用 query 参数时：
+  - query 方法：专为金融品种时序表设计，所查询的表要求包含 code 和 datetime 列，用户指定时间范围和品种范围，即可查询表的数据
+  - query_raw 方法：任意表都能查询，可通过 fields 指定查询字段，condition 指定查询条件。
 
     ```python
     In:
