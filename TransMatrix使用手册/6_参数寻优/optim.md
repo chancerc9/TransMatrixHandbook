@@ -23,11 +23,11 @@
 
 与标准的因子研究和交易策略模式一样，同样需要 strategy.py 和 evaluator.py 来指定策略逻辑和评价逻辑。
 
-不同的是，
+特别的是，
 
 - strategy.py 中通过 self.param 获得待优化的参数；
 
-- evaluator.py 中的 critic 方法<u>必须</u>返回一个数值，此数值就是目标函数的值，参数优化的方向为<u>目标函数值越大越好</u>。
+- evaluator.py 中的 critic 方法就是寻优的目标函数，所有要求critic方法<u>必须</u>返回一个数值（参数优化的方向为<u>目标函数值越大越好</u>）。
 
 > Tips:
 >
@@ -39,8 +39,14 @@
 
 **交易策略：**
 
+假设我们想要对一个使用 mean(macd, window_size) 作为交易信号的策略使用参数优化。
+
+其中，我们需要优化的参数为window_size，目标函数为策略的总pnl，也就是说，我们想要找最优的window_size值使得策略的收益最大。此时，在strategy中，self.param 是 `{'window_size': 某备选值}`；在evaluator中，critic方法用来计算策略的总收益，并返回总收益的数值。
+
+具体写法如下：
+
 - strategy.py
-  通过 self.param['window_size'] 获得计算买入信号的窗口大小。
+  通过 `self.param['window_size']` 获得计算买入信号的窗口大小。
 
 
 ```python
@@ -80,7 +86,7 @@ class TestStra(Strategy):
 
 - evaluator.py
 
-    简单地将策略的总 pnl 作为优化的目标函数值。
+    将策略的总 pnl 作为优化的目标函数值。
 
 ```python
 from transmatrix.evaluator.simulation import SimulationEvaluator
@@ -103,9 +109,15 @@ class TestEval(SimulationEvaluator):
 
 **因子研究：**
 
+假设我们想要对一个reverse因子的计算过程使用参数优化，这个因子的计算过程中要使用到两个参数 ret 和 roll，它们分别指代收益率计算的time lag大小和rolling mean的窗口大小。
+
+所以我们需要优化的参数为 ret 和 roll，目标函数为因子的IC值，也就是说，我们想要找最优的 ret 和 roll值使得因子的IC值最大。此时，在strategy中，self.param 是 `{'ret': 某备选值, 'roll': 某备选值}`；在evaluator中，critic方法用来计算因子的IC值，并返回它。
+
+具体写法如下：
+
 - strategy.py
 
-    通过 self.param['ret'] 和 self.param['roll'] 获得相应的窗口大小。
+    通过 `self.param['ret']` 和 `self.param['roll']` 获得相应的参数值。
 
 ```python
 from scipy.stats import zscore
@@ -142,7 +154,7 @@ class TestStra(SignalStrategy):
 
 - evaluator.py
 
-    简单地将因子的 IC 值作为优化的目标函数值。
+    将因子的 IC 值作为优化的目标函数值。
 
 ```python
 import pandas as pd
