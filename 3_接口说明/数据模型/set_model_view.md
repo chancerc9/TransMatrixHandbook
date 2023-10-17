@@ -1,7 +1,7 @@
 ### [数据管理](8_测例代码\transmatrix特色功能\数据获取-data_api\量价数据)
 TransMatrix-python 框架使用 numpy 作为默认的数据后端。
 
-在回测引擎中，数据管理分为[数据订阅]()和数据回放两个阶段:
+在回测引擎中，数据管理分为[数据订阅](3_接口说明/策略/generator.md/#subscribe_data)和数据回放两个阶段:
 
 数据订阅：用户的一次数据订阅将产生一个指向目标[数据集合](#Dataset)的[视图](#DataView)。
 
@@ -10,7 +10,7 @@ TransMatrix-python 框架使用 numpy 作为默认的数据后端。
 数据视图对外提供丰富的查询接口，保证用户获取最新数据。
 
 ---
---- 
+---
 
 ### Dataset
 
@@ -241,6 +241,8 @@ TransMatrix-python 框架使用 numpy 作为默认的数据后端。
     - index: 目标时间段
     - columns: 字段名
 
+---
+
 <b> to_dataframe </b>
 
 将 Data2d 数据转化成 dataframe
@@ -251,7 +253,130 @@ TransMatrix-python 框架使用 numpy 作为默认的数据后端。
     - index: 时间戳
     - columns: 字段集合
 
+---
 
+---
+
+#### StructArray
+
+存储一个二维结构体数组，底层为 numpy.ndarray（结构体数据）。
+
+---
+
+**\__init__** 
+
+- 参数:
+  - data (numpy.ndarray): 数据集（将根据数据集的形状推断数据维度，目前支持 2维 和 3维数据）
+  - describe (List): 数据集的描述信息（长度为2）
+    - 时间戳 (Iterable[datetime])
+    - 字段列表 (Iterable[str] 或 str)
+
+---
+
+**from_dataframe**
+
+将dataframe数据转化成 StructArray 数据模型
+
+- <b> 参数 </b> : 
+  - data (Dataframe): 数据
+  - start, end: 起止时间.
+  - cols: (List[str]): 字段列表
+- <b> 返回值 </b> : StructArray
+
+---
+
+**from_ndarray**
+
+将numpy.ndarray数据转化成 StructArray 数据模型
+
+- <b> 参数 </b> : 
+  - data (ndarray): 数据
+  - describe (List): 数据集的描述信息（长度为2）
+    - 时间戳 (Iterable[datetime])
+    - 字段列表 (Iterable[str] 或 str)
+- <b> 返回值 </b> : StructArray
+
+---
+
+**from_data2d**
+
+将Data2d数据转化成 StructArray 数据模型
+
+- <b> 参数 </b> : 
+  - data (Data2d): Data2d数据
+- <b> 返回值 </b> : StructArray
+
+---
+
+**from_csv**
+
+读取csv数据并转化成 StructArray 数据模型
+
+- <b> 参数 </b> : 
+  - file_path (str): 数据路径
+  - start, end: 起止时间.
+  - cols: (List[str]): 字段列表
+
+- <b> 返回值 </b> : StructArray 
+
+- <b> csv格式要求 </b> 
+  - 必须存在名为 datetime 的时间戳列
+  - 返回的结果数据只包含一个标的 (2维面板数据)。 此时要求 datetime 列中不包含重复时间戳。
+
+- <b> start, end 处理逻辑 </b> :
+  - start, end 接受  str / datetime / date 类型的输入
+  - 若输入的 end 为日期，则将时间修改为当日 16:00
+
+---
+
+**from_parquet**
+
+读取parquet数据并转化成 StructArray 数据模型
+
+- <b> 参数 </b> : 
+  - file_path (str): 数据路径
+  - start, end: 起止时间.
+  - cols: (List[str]): 字段列表
+
+- <b> 返回值 </b> : StructArray 
+
+- <b> parquet格式要求 </b> 
+  - 必须存在名为 datetime 的时间戳列
+  - 返回的结果数据只包含一个标的 (2维面板数据)。 此时要求 datetime 列中不包含重复时间戳。
+
+- <b> start, end 处理逻辑 </b> :
+  - start, end 接受  str / datetime / date 类型的输入
+  - 若输入的 end 为日期，则将时间修改为当日 16:00
+
+---
+
+**from_db**
+
+读取 db 数据并转化成 StructArray 数据模型
+
+- <b> 参数 </b>:
+  - table_name (str): 数据表名
+  - db_name (str): 数据库名
+  - start, end: 起止时间.
+  - codes (str): 标的代码
+  - fields: (Union[List[str],str]) : 字段列表
+
+- <b> start, end 处理逻辑 </b> :
+  - start, end 接受  str / datetime / date 类型的输入
+  - 若 start,end 为字符串, 则将其转换为 datetime 格式
+  - 若输入的 end 为日期，则将时间修改为当日 16:00
+
+---
+
+**to_dataframe**
+
+将 StructArray 数据转化成 dataframe
+
+- <b> 参数 </b>: 无
+- <b> 返回值 </b>: 
+  - Dataframe
+    - index: 时间戳
+    - columns: 字段集合
 
 ---
 ---
@@ -331,6 +456,8 @@ TransMatrix-python 框架使用 numpy 作为默认的数据后端。
 ---
 
 #### DataView2d
+
+2d数据视图，对外提供数据查询接口，用于获取最新数据。
 
 ---
 
@@ -419,6 +546,7 @@ datetime
 2021-01-20 15:00:00	22.47	30.50
 ```
 <b> get </b>
+
   - <b>功能</b>: 获取指定字段的最新一条数据
   - <b>参数</b>:
     - field (str): 字段名
@@ -821,6 +949,7 @@ datetime
 
 ---
 
+<<<<<<< HEAD
 <b> query_code </b>
   - <b>功能</b>: 根据指定时间和标的代码查询数据
   - <b>参数</b>:
@@ -868,3 +997,128 @@ datetime
 ```
 
 ---
+=======
+---
+
+#### DataViewStruct
+
+StructArray的数据视图，对外提供数据查询接口，用于获取最新数据。
+
+---
+
+<b> \__init__ </b>
+
+- 参数: 
+  - data (StructArray): StructArray数据
+  - cursor (BaseCursor): 控制数据回放的游标
+
+---
+
+**get**
+
+获取所有字段的最新一条数据
+
+  - <b>参数</b>:
+    - 无
+  - <b>返回值</b>: 
+    - numpy.void：结构体数据
+
+> 示例：要想获得某个字段的数据
+>
+> ```python
+> tick_data  = data.get()
+> ask_price_1 = tick_data['ask_price_1']
+> ```
+
+---
+
+<b> get_dict </b>
+
+获取最新一条数据, 返回字典
+
+  - <b>参数</b>:
+    - 无
+  - <b>返回值</b>: 
+    - dict: key: 字段, value: 对应字段的数据值
+
+> 示例：要想获得某个字段的数据
+>
+> ```python
+> tick_data  = data.get_dict()
+> ask_price_1 = tick_data['ask_price_1']
+> ```
+
+---
+
+<b> get_window </b>
+
+获取最新n条数据
+
+  - <b>参数</b>:
+    - length (int): window长度
+  - <b>返回值</b>: 
+    - np.ndarray : 指定长度的数据
+
+> 示例：要想获得某个字段的数据
+>
+> ```python
+> tick_data  = data.get_window(5)
+> ask_price_1 = tick_data['ask_price_1']
+> # ask_price_1.shape: (5,)
+> ```
+
+---
+
+<b> get_future </b>
+
+获取所有字段的未来的一条数据
+
+  - <b>参数</b>:
+    - shift (int): 读取未来第shift个时间戳的数据
+  - <b>返回值</b>: 
+    - dict: key: 字段, value: 对应字段的数据值
+
+> 示例：要想获得下一个时间戳某个字段的数据
+>
+> ```python
+> tick_data  = data.get_future(shift=1)
+> ask_price_1 = tick_data['ask_price_1']
+> ```
+
+---
+
+<b> get_future_dict</b>
+
+获取所有字段的未来的一条数据, 返回字典
+
+  - <b>参数</b>:
+    - shift (int): 读取未来第shift个时间戳的数据
+  - <b>返回值</b>: 
+    - dict: key: 字段, value: 对应字段的数据值
+
+> 示例：要想获得下一个时间戳某个字段的数据
+>
+> ```python
+> tick_data  = data.get_future_dict(shift=1)
+> ask_price_1 = tick_data['ask_price_1']
+> ```
+
+---
+
+**get_future_window**
+
+获取从当前时间开始，未来的最近n条数据
+
+  - <b>参数</b>:
+    - length (int): 读取未来最近length个时间戳的数据
+  - <b>返回值</b>: 
+    - np.ndarray : 指定长度的数据
+
+> 示例：要想获得某个字段的数据
+>
+> ```python
+> tick_data  = data.get_future_window(5)
+> ask_price_1 = tick_data['ask_price_1']
+> # ask_price_1.shape: (5,)
+> ```
+>>>>>>> e6a1227fe21e477c74e5bcc5e43f0660aa51c3fc
