@@ -12,7 +12,7 @@ TransMatrix-python 框架使用 numpy 作为默认的数据后端。
 ---
 ---
 
-### Dataset
+### **Dataset**
 
 描述一个数据集合
 
@@ -818,9 +818,8 @@ array([19.9 , 28.79])
 
 ---
 
----
-
 <b> iloc_code </b>
+
   - <b>功能</b>: 返回指定位置的数据
   - <b>参数</b>:
     - i (int): 指定位置
@@ -845,9 +844,8 @@ dv.iloc_code(1, code='000001.SZ', fields='close')的数据
 
 ---
 
----
-
 <b> loc_code </b>
+
   - <b>功能</b>: 返回指定时间、指定标的代码的数据，若给定时间不在数据时间索引中，则返回在该时间之前并且最接近的数据
   - <b>参数</b>:
     - date_index (Union[datetime, pd.Timestamp, List[datetime], List[pd.Timestamp]]): 指定时间
@@ -949,8 +947,8 @@ datetime
 
 ---
 
-<<<<<<< HEAD
 <b> query_code </b>
+
   - <b>功能</b>: 根据指定时间和标的代码查询数据
   - <b>参数</b>:
     - time (datetime): 指定时间
@@ -997,7 +995,7 @@ datetime
 ```
 
 ---
-=======
+
 ---
 
 #### DataViewStruct
@@ -1027,6 +1025,7 @@ StructArray的数据视图，对外提供数据查询接口，用于获取最新
 >
 > ```python
 > tick_data  = data.get()
+> # tick_data: numpy.void 结构体数组
 > ask_price_1 = tick_data['ask_price_1']
 > ```
 
@@ -1045,6 +1044,7 @@ StructArray的数据视图，对外提供数据查询接口，用于获取最新
 >
 > ```python
 > tick_data  = data.get_dict()
+> # tick_data: Dict
 > ask_price_1 = tick_data['ask_price_1']
 > ```
 
@@ -1063,8 +1063,8 @@ StructArray的数据视图，对外提供数据查询接口，用于获取最新
 >
 > ```python
 > tick_data  = data.get_window(5)
-> ask_price_1 = tick_data['ask_price_1']
-> # ask_price_1.shape: (5,)
+> # tick_data: numpy.ndarray 结构体数组
+> ask_price_1 = tick_data['ask_price_1']  # ask_price_1.shape: (5,)
 > ```
 
 ---
@@ -1121,4 +1121,3 @@ StructArray的数据视图，对外提供数据查询接口，用于获取最新
 > ask_price_1 = tick_data['ask_price_1']
 > # ask_price_1.shape: (5,)
 > ```
->>>>>>> e6a1227fe21e477c74e5bcc5e43f0660aa51c3fc
