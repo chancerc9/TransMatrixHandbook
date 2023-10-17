@@ -233,7 +233,7 @@ Out:
 
 ### 3.4 定时更新因子数据
 
-假设计算得到的因子数据，通过了因子评价检验，需要每日增量更新因子数据，应该如何实现？只需要打开系统提供的定时任务模块，通过配置定时更新因子数据的调度任务，即可实现。更多介绍，参见 TransQuant 的[定时任务](http://xiewenqing1989.gitee.io/transquantproductdoc.github.io/#/README?id=_252-%e5%ae%9a%e6%97%b6%e4%bb%bb%e5%8a%a1)。
+假设计算得到的因子数据，通过了因子评价检验，需要每日增量更新因子数据，应该如何实现？只需要打开系统提供的定时任务模块，通过配置定时更新因子数据的调度任务，即可实现。更多介绍，参见 TransQuant 的[定时任务](http://transquant.gitee.io/transquantproductdoc.github.io/#/?id=_252-%e5%ae%9a%e6%97%b6%e4%bb%bb%e5%8a%a1)。
 
 ### 3.5 一个完整的股票多因子策略示例
 

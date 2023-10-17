@@ -4,4 +4,4 @@
 
 [TransMatrix 使用手册](TransMatrix使用手册/README.md)
 [TransMatrix API文档](README.md)
-[TransQuant 使用手册](http://xiewenqing1989.gitee.io/transquantproductdoc.github.io)
+[TransQuant 使用手册](http://transquant.gitee.io/transquantproductdoc.github.io)
