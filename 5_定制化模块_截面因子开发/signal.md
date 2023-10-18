@@ -79,10 +79,10 @@ SignalStrategy 也是 [Generator](3_接口说明/策略/generator.md) 的子类�
 每个SignalStrategy只允许存在一个clock（底层为定时器scheduler）, 将决定策略因子和信号的更新时点。
 
 <b> 参数 </b>：
-- scheduler (BaseScheduler, optional): [定时器实例](). Defaults to None.
-- milestones (List[str], optional): 时间列表（[定时任务]()）. Defaults to None.
-- freq (timedelta, optional): 回调频率（[定频任务]()）. Defaults to None.
-- with_data (str, optional): 数据订阅对应的属性名(按某一[订阅数据]()触发回调). Defaults to None.
+- scheduler (BaseScheduler, optional): 定时器实例. Defaults to None.
+- milestones (List[str], optional): 时间列表. Defaults to None.
+- freq (timedelta, optional): 回调频率. Defaults to None.
+- with_data (str, optional): 数据订阅对应的属性名(按某一[订阅数据](3_接口说明/策略/generator.md#subscribe_data)触发回调). Defaults to None.
 - handler (Callable): 回调函数。
 
 注意：scheduler，milestones，freq，with_data 有且只有一个有效。

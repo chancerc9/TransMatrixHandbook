@@ -139,9 +139,9 @@ class MyGeneratorA(Generator):
 <b> 添加定时器 </b>
 
 <b> 参数 </b>：
-- scheduler (BaseScheduler, optional): [定时器实例](). Defaults to None.
-- milestones (List[str], optional): 时间列表（[定时任务]()）. Defaults to None.
-- freq (timedelta, optional): 回调频率（[定频任务]()）. Defaults to None.
+- scheduler (BaseScheduler, optional): 定时器实例. Defaults to None.
+- milestones (List[str], optional): 时间列表. Defaults to None.
+- freq (timedelta, optional): 回调频率. Defaults to None.
 - with_data (str, optional): 数据订阅对应的属性名(按某一[订阅数据](#subscribe_data)的更新触发回调). Defaults to None.
 - handler (Callable): 回调函数。
 - offset (str): 时间戳的平移值，例如'1min', '-1min', '0.1s', '-0.1s'等。
