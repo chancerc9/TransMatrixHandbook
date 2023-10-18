@@ -87,7 +87,7 @@ ___
   - lag: 
     - 若为量价数据，则传入整数，含义为缓冲期长度（天）。系统会将回测开始时间前推
     - 若为财报数据，则传入'3Q','1Y' ... 等，系统将按报告期生成滞后字段
-        
+    
   - category: 
     - 若为A股财报数据，则填入'finance-report' (describe 长度为 6)
     - 若为其他数据，则不提供该字段 (describe 长度为 5)
@@ -142,8 +142,12 @@ class MyGeneratorA(Generator):
 - scheduler (BaseScheduler, optional): [定时器实例](). Defaults to None.
 - milestones (List[str], optional): 时间列表（[定时任务]()）. Defaults to None.
 - freq (timedelta, optional): 回调频率（[定频任务]()）. Defaults to None.
-- with_data (str, optional): 数据订阅对应的属性名(按某一[订阅数据]()触发回调). Defaults to None.
+- with_data (str, optional): 数据订阅对应的属性名(按某一[订阅数据](#subscribe_data)的更新触发回调). Defaults to None.
 - handler (Callable): 回调函数。
+- offset (str): 时间戳的平移值，例如'1min', '-1min', '0.1s', '-0.1s'等。
+- check_date (Bool): 是否只保留交易日。
+- check_time (Bool):  是否只保留spans中的日内时间。
+- spans (List[List[str]]): 例如 [['09:30:00', '15:00:00']] 或  [['09:30:00', '11:30:00'], ['13:00:00', '15:00:00']]。
 
 注意：scheduler，milestones，freq，with_data 有且只有一个有效。
 
@@ -154,12 +158,32 @@ class MyGeneratorA(Generator):
 class MyGenerator(Generator):
 
     def init(self):
+        # 定时任务：
         self.add_scheduler(
-            milestons = ['10:00:00','14:00:00'],
-            handler = my_callback
+            milestones = ['10:00:00','14:00:00'],
+            handler = self.my_callback1
         )
-    
-    def my_callback(self):
+        # 定频任务：
+        self.add_scheduler(
+            freq = '30min',
+            handler = self.my_callback2
+        )
+        # with_data任务：
+        self.subscribe_data(
+            'mydata', ['*', 'stock_bar_1day', '000001.SZ', 'open,close', 0]
+        )
+        self.add_scheduler(
+            with_data = 'mydata',
+            handler = self.my_callback3
+        )
+        
+    def my_callback1(self):
+        print(self.time)
+        
+    def my_callback2(self):
+        print(self.time)
+        
+    def my_callback3(self):
         print(self.time)
 ```
 ---
@@ -206,5 +230,4 @@ class MyGeneratorB(Generator):
         print(f'接收到来自 a 的波动率信息: vol = {msg}')
 ```
 ---
-
 

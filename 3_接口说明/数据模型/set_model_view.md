@@ -1,7 +1,7 @@
 ### [数据管理](8_测例代码\transmatrix特色功能\数据获取-data_api\量价数据)
 TransMatrix-python 框架使用 numpy 作为默认的数据后端。
 
-在回测引擎中，数据管理分为[数据订阅](3_接口说明/策略/generator.md/#subscribe_data)和数据回放两个阶段:
+在回测引擎中，数据管理分为[数据订阅](3_接口说明/策略/generator.md#subscribe_data)和数据回放两个阶段:
 
 数据订阅：用户的一次数据订阅将产生一个指向目标[数据集合](#Dataset)的[视图](#DataView)。
 
@@ -260,6 +260,8 @@ TransMatrix-python 框架使用 numpy 作为默认的数据后端。
 #### StructArray
 
 存储一个二维结构体数组，底层为 numpy.ndarray（结构体数据）。
+
+> 此数据结构专用于储存单个标的的高频数据，数据的两个维度分别指时间和字段。
 
 ---
 
@@ -1001,6 +1003,8 @@ datetime
 #### DataViewStruct
 
 StructArray的数据视图，对外提供数据查询接口，用于获取最新数据。
+
+> 此数据结构专用于储存单个标的的高频数据，数据的两个维度分别指时间和字段。
 
 ---
 

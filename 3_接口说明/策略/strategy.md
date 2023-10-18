@@ -33,7 +33,11 @@ Strategy 是 [Generator](3_接口说明/策略/generator.md) 的子类，可实�
 - <b> init()</b>  完成数据订阅、因子订阅、自定义回调函数、信息流、定时器的注册。
 - <b> on_init()</b>  回测开始前的用户操作
 - <b> on_market_open(`market_name`)  </b>  每日开盘时的用户操作（对应 Matrix 配置信息中 market 下的字段名）
-- <b> on_market_data_update([data]())</b>  市场数据更新时的用户操作
+- <b> on_market_data_update([data](4_其他组件/market_components.md#Market的数据回放))</b>  市场数据更新时的用户操作
+- <b> on_tick([tick](4_其他组件/market_components.md#Market的数据回放))</b>  当matcher配置为'tick'时，tick级市场数据更新时的用户操作
+
+> 关于 on_market_data_update 和 on_tick 的具体说明，见[Market的数据回放](4_其他组件/market_components.md#Market的数据回放)。
+
 - <b> on_market_close(`market_name`) </b>  每日收盘时的用户操作（对应 Matrix 配置信息中 market 下的字段名）
 - **on_receive([order](4_其他组件/market_components.md))** 账户收到订单时的用户操作
 - <b> on_trade([order](4_其他组件/market_components.md)) </b> 订单成交时的用户操作

@@ -19,21 +19,35 @@
   - name (str): 市场组件的名称
   - account (str): 账户
 
-#### StockMarket 
+##### Market的数据回放
 
-股票市场组件。
+Market 会更新市场数据并执行回调函数，在配置不同 matcher 时，对 Strategy 执行的回调函数不同：
 
-#### FuturesMarket
+- matcher 设为 bar 时, Strategy 对应的回调函数为 [on_market_data_update](3_接口说明/策略/strategy.md#回调函数)，其中参数 data 的数据结构是 [DataView3d](3_接口说明/数据模型/set_model_view.md#DataView3d)。
 
-期货市场组件。
+  ```python
+  class MyStrategy(Strategy):
+      
+      def on_market_data_update(self, data: DataView3d):
+          close_price = data.get(field='close', codes='000001.SZ')
+  ```
 
-#### BatchTradingStockMarket
+- matcher 设为 tick / order 时, Strategy 对应的回调函数为 [on_tick](3_接口说明/策略/strategy.md#回调函数) 和 [on_market_data_update](3_接口说明/策略/strategy.md#回调函数)，其中参数 data 的数据结构：
 
-股票批量交易市场，用于处理批量交易订单。
+  - on_market_data_update: [DataViewStruct](3_接口说明/数据模型/set_model_view.md#DataViewStruct)
+  - on_tick: 结构体数组 numpy.void，即 `DataViewStruct.get()` 得到的数据切片
 
-#### BatchTradingFuturesMarket
+  > 注意，此时策略须为单标的策略，即codes中只包含一个标的。
 
-期货批量交易市场，用于处理批量交易订单。
+  ```python
+  class MyStrategy(Strategy):
+      
+      def on_market_data_update(self, data: DataViewStruct):
+          ask_price_1 = data.get()['ask_price_1']
+      
+      def on_tick(self, tick: numpy.void):
+          ask_price_1 = tick['ask_price_1']
+  ```
 
 ---
 
@@ -126,7 +140,7 @@ class MATCH_EVENT(Enum):
 
 ```
 
-#### Bar撮合器
+##### Bar撮合器
 
 通过配置market的matcher字段为'bar'来使用。
 
@@ -183,18 +197,7 @@ class BarMatcher(BaseMatcher):
         return MatchResult(order = order, event = MATCH_EVENT.CANCEL) # 返回事件：全部撤单
 ```
 
-在策略组件中，通过定义 on_market_data_update 来使用市场bar数据：
-
-```python
-class MyStrategy(strategy):
-    
-    def on_market_data_update(self, data: DataView3d):
-        close_price = data.get(field='close', codes='000001.SZ')
-```
-
-
-
-#### Tick撮合器
+##### Tick撮合器
 
 通过配置market的matcher字段为'tick'来使用，默认使用10档深度。
 
@@ -536,18 +539,7 @@ class TickMatcherDetail(BaseMatcher):
         return MatchResult(order = order, event = MATCH_EVENT.NOTHING)
 ```
 
-在策略组件中，通过定义 on_tick 来使用市场tick数据：
-
-```python
-class MyStrategy(strategy):
-    
-    def on_tick(self, tick: Dict[code, DataViewStruct]):
-        ask_price_1 = tick['000001.SZ'].get()['ask_price_1']
-```
-
-
-
-#### Order撮合器
+##### Order撮合器
 
 通过配置market的matcher字段为'order'来使用，默认使用10档深度。
 
@@ -1163,16 +1155,5 @@ class OrderFlowMatcher(BaseMatcher):
             order.front_volume = 0
             return MatchResult(order = order, event = MATCH_EVENT.CANCEL)
 ```
-
-在策略组件中，通过定义 on_tick 来使用市场tick数据：
-
-```python
-class MyStrategy(strategy):
-    
-    def on_tick(self, tick: Dict[code, DataViewStruct]):
-        ask_price_1 = tick['000001.SZ'].get()['ask_price_1']
-```
-
-
 
 ---
