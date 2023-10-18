@@ -12,8 +12,12 @@ Strategy 是 [Generator](3_接口说明/策略/generator.md) 的子类，可实�
 
 - <b>buy(`price`,`volume`,`offset`,`code`,`market`)</b> : 买入指令， 参数：价格，数量，开平方向，标的代码，市场代码 (在Matrix中配置)
 - <b>sell(`price`,`volume`,`offset`,`code`,`market`)</b> : 卖出指令， 参数：价格，数量，开平方向，标的代码，市场代码 (在Matrix中配置)
-- <b>cancel([order](4_其他组件/market_components.md#order))</b> : 撤单指令： 参数：Order 实例。
-- <b> get_netpos(`code`)</b> :查看净仓位
+- <b>cancel([order](4_其他组件/market_components.md#order))</b> : 撤单指令，参数 order 为Order 实例。
+- <b> get_netpos(`code`)</b> : 查看净仓位
+- **get_longpos_closeable(`code`)**: 股票账户，获得当前持有的可平多头仓位
+- **get_equity(`price_field`)**: 用于获取当前账户总的资产价值（持仓价值+现金），price_field 是用于计算权益的价格字段，默认为 None，将自动从订阅的市场行情数据中匹配。 
+- **get_position_value(`price_field`)**: 用于获取当前账户总的持仓市值，price_field 是用于计算权益的价格字段，默认为 None，将自动从订阅的市场行情数据中匹配。 
+- **get_equity_code(`code`,`price_field`)**: 用于获取指定标的的相关持仓信息。返回 cur_pnl (标的持仓的当前盈亏)、pnl (账户在该标的的累积盈亏)、hold (标的当前的持仓)、equity (标的当前持仓的权益)。
 - <b> pending_orders</b> (属性):  查看当前未成交挂单 Dict[order_id, Order]
 
 
