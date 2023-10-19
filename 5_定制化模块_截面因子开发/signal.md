@@ -18,12 +18,11 @@ Signal模式与[普通交易模式](3_接口说明/Matrix/matrix.md)的使用流
 #### 配置回测信息
 
 必须参数:
-- span : List[Union[str, datetime]], # 回测时间段
-- codes : Union[List, str], # 回测标的
+- span (List[Union[str, datetime]]):  回测时间段
+- codes (Union[List, str]): 回测标的
 
 可选参数:
-- universe (list): 配置动态票池.
-- context  (list or dict): 自定义参数, Strategy 和 Evaluator 注册后可通过 .matrix_context 获取。
+- universe (list): 配置动态票池，例如 `['meta_data', 'critic_data', 'is_hs300']`。
 - backend (str): 控制评价展示的输出方式（包括可视化和回测kpi指标），'ipython' 指在notebook显示，'tqclient' 指在客户端显示。
 
 
@@ -61,31 +60,32 @@ matrix.add_component(eval_b)
 
 ### SignalStrategy
 
-与基础模式下的 [Strategy](3_接口说明/策略/strategy.md)一样，
-SignalStrategy 也是 [Generator](3_接口说明/策略/generator.md) 的子类，可调用[订阅数据](3_接口说明/策略/generator.md#subscribe_data)、[订阅因子](3_接口说明/策略/generator.md#subscribe)、[添加定时器](3_接口说明/策略/generator.md#add_scheduler)、[注册信息流、发布信息、构建自定义回调。](3_接口说明/策略/generator.md#generator-间的信息传递)等接口。
+与基础模式下的 [Strategy](3_接口说明/策略/strategy.md)一样，SignalStrategy 也是 [Generator](3_接口说明/策略/generator.md) 的子类，可调用[订阅数据](3_接口说明/策略/generator.md#subscribe_data)、[订阅因子](3_接口说明/策略/generator.md#subscribe)、[添加定时器](3_接口说明/策略/generator.md#add_scheduler)、[注册信息流、发布信息、构建自定义回调](3_接口说明/策略/generator.md#generator-间的信息传递)等接口。
 
-此外，SignalStrategy 还包含以下特殊接口：
-
----
+SignalStrategy 包含以下特殊接口：
 
 #### add_clock
 
 <b> 在 init 函数中调用，添加因子更新定时器 </b>
 
-用于注册 on_clock 函数对应的回调时点。
+用于注册 on_clock 函数对应的回调时点。每个 SignalStrategy 只允许存在一个 clock（底层为定时器scheduler）, 将决定因子和信号的更新时点。
 
-参数与 [Generator.add_scheduler](3_接口说明/策略/generator.md#add_scheduler) 一致。
+参数类似 [Generator.add_scheduler](3_接口说明/策略/generator.md#add_scheduler) 。
 
-每个SignalStrategy只允许存在一个clock（底层为定时器scheduler）, 将决定策略因子和信号的更新时点。
+- <b>  参数 </b>：
 
-<b> 参数 </b>：
-- scheduler (BaseScheduler, optional): 定时器实例. Defaults to None.
-- milestones (List[str], optional): 时间列表. Defaults to None.
-- freq (timedelta, optional): 回调频率. Defaults to None.
-- with_data (str, optional): 数据订阅对应的属性名(按某一[订阅数据](3_接口说明/策略/generator.md#subscribe_data)触发回调). Defaults to None.
-- handler (Callable): 回调函数。
+  - scheduler (BaseScheduler, optional): 定时器实例. Defaults to None.
 
-注意：scheduler，milestones，freq，with_data 有且只有一个有效。
+  - milestones (List[str], optional): 时间列表. Defaults to None.
+
+  - freq (timedelta, optional): 回调频率. Defaults to None.
+
+  - with_data (str, optional): 数据订阅对应的属性名(按某一[订阅数据](3_接口说明/策略/generator.md#subscribe_data)触发回调). Defaults to None.
+
+  - handler (Callable): 回调函数。
+
+
+> 注意：scheduler，milestones，freq，with_data 有且只有一个有效。
 
 ---
 
@@ -99,17 +99,8 @@ key 为因子名称，value 为一个基于 clock 时间的 [2D数据视图](3_�
 
 用户可在 on_clock 函数中通过 self.factor_data 获得数据视图，并通过 update_factor 更新数据。
 
-<b> 参数 </b>: factor_names (List[str] 或 str) 因子名称（列表）
-
----
-
-#### update_factor
-
-<b> 在 on_clock 函数中调用，更新因子数据 </b>
-
-<b>  参数: </b>
-- name (str): 因子名称
-- value (float): 因子值
+- <b> 参数 </b>: 
+  - factor_names (List[str] 或 str): 因子名称（列表）
 
 ---
 
@@ -119,26 +110,52 @@ key 为因子名称，value 为一个基于 clock 时间的 [2D数据视图](3_�
 
 交易信号指的是经过简单处理即可转化成持仓的数据。
 
-<b>  返回值: </b>
+- <b>  返回值:  </b>[DataView2d](3_接口说明/数据模型/set_model_view#DataView2d)
 
-- Dict
-  - key（timestamp）: 时间
-  - value (float): 信号数据
+> 可通过 DataView2d.to_dataframe() 来获得 signal 的 DataFrame。 
+
+---
+
+#### factor_data (属性)
+
+用于存储策略生成的因子。
+
+- <b>  返回值:  </b>Dict[factor_name, [DataView2d](3_接口说明/数据模型/set_model_view#DataView2d)]
+
+> 可通过 DataView2d.to_dataframe() 来获得 signal 的 DataFrame。 
+
+> **signal 和 factor_data  的区别：**
+>
+> - signal 储存单个信号（因子）数据，
+> - factor_data 储存多个因子数据，
 
 ---
 
 #### update_signal
 
-<b> 在 init 函数中调用，更新信号数据 </b>
+在 init 函数中调用，更新信号数据。
 
 - 参数: 
     - value (float): 信号数据
 
 ---
 
+#### update_factor
+
+在 on_clock 函数中调用，更新因子数据。
+
+- <b>  参数: </b>
+
+  - name (str): 因子名称
+
+  - value (float): 因子值
+
+
+---
+
 #### save_factors
 
-<b> 将因子数据存入数据库 </b>
+将因子数据存入数据库。
 
 若数据库中不存在与因子名称相同的列， 则创建该列并插入数据。
 
@@ -153,7 +170,7 @@ key 为因子名称，value 为一个基于 clock 时间的 [2D数据视图](3_�
 
 #### save_signal
 
-<b> 将信号数据存入数据库 </b>
+将信号数据存入数据库。
 
 机制与save_factors 相同。
 
@@ -163,26 +180,38 @@ key 为因子名称，value 为一个基于 clock 时间的 [2D数据视图](3_�
 
 ---
 
+#### set_signal
+
+在 post_transform 中使用，目的是将处理后的因子数据赋给 self.signal。
+
+- <b> 参数 </b>: 
+  - signal: 因子数据
+
+---
+
 #### 系统回调函数
 
-<b> on_clock </b>
+- <b> on_clock </b>
 
 基于 clock 时点的回调函数， 用于编写因子和信号计算逻辑
 
-<b> pre_transform </b>
+- <b> pre_transform </b>
 
 对订阅数据进行向量化计算 
 
-`注意:`
-- 向量化预计算仅适用于回测，用于快速验证交易逻辑。
-- TransMatrix实盘交易系统中不存在与pre_transform对应的接口。
+> 注意:
+>
+> - 向量化预计算仅适用于回测，用于快速验证交易逻辑。
+> - TransMatrix实盘交易系统中不存在与pre_transform对应的接口。
 
-<b> post_transform </b>
+- <b> post_transform </b>
 
 对生成的因子或信号数据向量化计算
 
+---
 
-#### 代码示例
+
+#### SignalStrategy 代码示例
 
 ```python
 from transmatrix import SignalStrategy
@@ -215,7 +244,7 @@ class MacdSignal(SignalStrategy):
 
 ### SignalEvaluator
 
-SignalEvaluator 与 [基础评价器](3_接口说明/评价/evaluator.md)使用流程一致。
+SignalEvaluator 与 [基础评价器](3_接口说明/评价/evaluator.md) 使用流程一致。
 
 用户可在 init 函数中订阅评价器需要的数据，
 
@@ -229,11 +258,14 @@ SignalEvaluator 与 [基础评价器](3_接口说明/评价/evaluator.md)使用�
 
 在评价开始前，评价器订阅的所有数据都将按照如下规则 与 clock 时间戳对齐:
 
-<b> 1.对于 clock 中的时点 t </b>:
+1. **对于 clock 中的时点 t :**
+
 - 若数据中存在时点 t，则将该条数据与 t 配对。
-- 若数据中不存在时点 t，则将数据中时间 t 之后的第一条数据与 t 配对 (时间戳修改为 t)。
+- 若数据中不存在时点 t，则将数据中时间 t 之后的第一条数据与 t 配对 (并把时间戳修改为 t)。
 
-<b> 2.保留配对数据，剔除其他数据。</b>
+2. **保留配对数据，剔除其他数据。**
 
-上述对齐机制将确保每个订阅数据与clock的时间戳一致。
+上述对齐机制将确保每个订阅数据与 clock 的时间戳一致。由于 clock 的时间戳也是的时间戳，每个订阅数据也会与`SignalStrategy.signal`时间对齐。
+
+
 

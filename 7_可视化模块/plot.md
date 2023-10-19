@@ -18,6 +18,47 @@
   - xlabel / ylabel / y2label（str）：x轴 / y轴 / 第二y轴的名称。
   - figsize（tuple）：指定图片像素大小，仅支持`backend = 'ipython'`。
 
+
+- 在Evaluator中使用：
+
+  ```python
+  class Eval(SignalEvaluator):
+      
+      def init(self):
+          pass   
+      
+      def critic(self):
+          ini_cash = self.strategy.account.ini_cash
+          daily_stats = self.get_daily_stats()
+          pnl = self.get_pnl()
+          stra_netvalue = pnl.cumsum() + ini_cash
+          
+          dt_index = daily_stats.index.get_level_values('datetime').unique().sort_values()
+          dt_index = pd.to_datetime(dt_index).date
+          
+          # 给daily_stats添加持仓价值、权重等
+          daily_stats['total_value'] = daily_stats['net_position'] * daily_stats['settle_price']
+          daily_stats['weight'] = daily_stats['total_value'].values / stra_netvalue.loc[daily_stats.index.get_level_values('datetime')].values.reshape(-1)  
+          
+          perf = pd.DataFrame(index=dt_index)
+          # 策略收益
+          perf['每日损益'] = pnl
+          perf['策略净值'] = stra_netvalue / ini_cash
+          perf['策略收益率'] = (stra_netvalue / stra_netvalue.shift(1) - 1).fillna(0)
+          perf['策略累计收益率'] = (1 + perf['策略收益率']).cumprod() - 1
+          perf['单标的最大资金占用'] = daily_stats['weight'].groupby(level='datetime').max()
+          
+          self.perf = perf
+          
+      def show(self):
+          perf = self.perf
+          
+          self.plot(perf[['策略净值']], kind='line', title='策略净值')
+          self.plot(perf[['策略收益率']], kind='line', title='策略收益率')
+          self.plot(perf[['策略累计收益率']], kind='line', title='策略累计收益率', areacol=0)
+          self.plot(perf[['每日损益']], kind='line', title='每日损益', name='损益')
+  
+  ```
 - 单独使用时：
 
   ```python
@@ -31,33 +72,11 @@
   plt.plot(data, kind='line')  # kind参数默认为'line'
   plt.plot(data, kind='bar')
   ```
-
-- 在Evaluator中使用：
-
-  ```python
-  class Eval(SignalEvaluator):
-      def init(self):
-          self.subscribe_data(
-              'pv', ['common','stock_bar_daily',self.codes,'open,high,low,close', 10]
-          )
-          self.subscribe_data(
-              'meta', ['common','critic_data', self.codes, 'is_zz500,ind', 10]
-          )
-          
-      # 省略其他函数内容
-          
-      def show(self):
-          self.plot(perf['qret']['tot'], kind='bar', title = 'QuantRetTot')
-          self.plot(perf['qret']['history'], title = 'QuantRetHistory')
-          
-          self.plot(perf['history'][['top_dd_ser', 'top_nav_ser']], second_y=1, title = 'TopNavHistory')
-          self.plot(perf['history'][['ls_dd_ser', 'ls_nav_ser']], second_y=1, title = 'LSNavHistory')
-          self.plot(perf['industryIC'].reset_index().rename(columns={'index':'industry'}), kind='table', title='行业IC和IR')
-  ```
   
-  > 以下示例均结合框架中Evaluator模块说明
 
-  
+> 以下示例均结合 Evaluator 模块进行说明。
+
+
 
 #### 折线图
 
@@ -284,19 +303,6 @@ self.plot(
 self.plot(
     data,
     kind='table',
-    title='plot_title'
-)
-```
-
-#### 矩形树图（仅支持前端）
-
-- `kind='tree'`
-- 要求输入数据的列名为：'timestamp', 'code', 'name', 'marketCode', 'marketName', 'positionMarketValue', 'cumsumProfit', 'industry', 'subIndustry'.
-
-```python
-self.plot(
-    treemap_df,
-    kind='tree',
     title='plot_title'
 )
 ```

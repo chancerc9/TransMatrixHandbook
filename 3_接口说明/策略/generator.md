@@ -48,8 +48,6 @@ e = MyGenerator(**kargs)
 
 assert d == e
 assert d.w == e.w == 3 and d.b == e.b == 4
-
-
 ```
 
 ___
@@ -120,10 +118,11 @@ class MyGenerator(Generator):
 若系统中已存在，则返回系统中的实例（保证唯一性），
 若不存在，则将传入的实例加入系统。
 
-<b> 参数 </b>: other (Generator): Generator实例
+<b> 参数 </b>: 
 
+- other (Generator): Generator实例
 
-<b> 返回值 </b>: registed_generator (Generator): 注册后的 Generator 实例
+<b> 返回值 </b>: registed_generator (Generator)，即被注册的 Generator 实例
 
 ```python
 class MyGeneratorA(Generator):
@@ -161,12 +160,16 @@ class MyGenerator(Generator):
         # 定时任务：
         self.add_scheduler(
             milestones = ['10:00:00','14:00:00'],
-            handler = self.my_callback1
+            handler = self.my_callback1,
+            check_date = True
         )
         # 定频任务：
         self.add_scheduler(
             freq = '30min',
-            handler = self.my_callback2
+            handler = self.my_callback2，
+            check_date = True,
+            check_time = True,
+            spans = [['09:30:00', '11:30:00'], ['13:00:00', '15:00:00']]
         )
         # with_data任务：
         self.subscribe_data(

@@ -57,20 +57,31 @@ class MyEvaluator(Evaluator):
 ```python
 import pandas as pd
 class MyEvaluator(Evaluator)
+
     def critic(self):
+        # 获得每日pnl / 交易记录 / 每日持仓记录
+        daily_pnl = self.get_pnl()
+        trade_table = self.get_trade_table()
+        daily_stats = self.get_daily_stats()
+        
         # 计算账户累计收益
-        self.nav = (pd.Series(self.get_pnl()).cumsum() + self.ini_cash) / self.ini_cash
+        self.nav = (pd.Series(daily_pnl).cumsum() + self.ini_cash) / self.ini_cash
         self.ret = (self.nav / self.nav.shift(1) - 1).fillna(0)
         self.yearly_ret = self.ret.mean() * 250
+                
 ```
 
-
 #### show
+
+在 show 方法中可自行定义可视化方法。同时，Transmatrix 提供了基于 plotly 开发的画图工具，见[可视化模块](7_可视化模块/plot.md)。
+
 ```python
 class MyEvaluator(Evaluator)
+
     def show(self):
         # 展示账户累计收益
-        self.acc_pnl.plot()
+        self.plot(self.nav, kinf='line', title='策略净值')
+        self.plot(self.ret, kinf='line', title='策略收益率')
 ```
 
 关于可视化模块的使用，详见[**可视化**](7_可视化模块/plot.md)。
@@ -78,9 +89,9 @@ class MyEvaluator(Evaluator)
 #### regist
 
 将回测结果注册到 TransQuant 平台策略面板。
-在 self.kpis 中写入相应指标。具体说明详见 TransQuant 产品使用说明。
+通过给 self.kpis 赋值（Dict[kpi_name, kpi_value]）。具体说明详见 TransQuant 产品使用说明。
 
-> 注意：Matrix配置信息中 backend 为 tqclient 时，Evaluator.regist() 注册的kpi指标才会显示在前端，否则需要通过 .kpis 属性获得。
+> 注意：Matrix配置信息中 backend 为 tqclient 时，Evaluator.regist() 提交的kpi指标才会显示在面板的因子库/策略库中。
 
 ```python
 
