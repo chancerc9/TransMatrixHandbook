@@ -709,7 +709,7 @@ Name: 000001.SZ, dtype: float64
 ---
 
 <b> get_window_code </b>
-  - <b>功能</b>:获取指定字段的最新 N 条数据
+  - <b>功能</b>:获取指定标的的最新 N 条数据
   - <b>参数</b>:
     - code (str): 标的代码
     - length (int): 数据长度
@@ -960,9 +960,7 @@ datetime
     - start_time (datetime, optional): 返回从指定时间开始的数据. Defaults to None.
     - window (timedelta, optional): 返回指定时间窗口内的数据. Defaults to None.
   - <b>返回值</b>: 
-    - dict: 
-      - key: 字段名
-      - value: pd.dataframe, index 为时间, columns 为标的代码
+    - pd.dataframe
 
 ```python
 dv3d.query_code(datetime(2021,1,12), code='000001.SZ', fields='close', periods=3)
@@ -1023,7 +1021,7 @@ StructArray的数据视图，对外提供数据查询接口，用于获取最新
   - <b>参数</b>:
     - 无
   - <b>返回值</b>: 
-    - numpy.void：结构体数据
+    - numpy.void：结构体数组
 
 > 示例：要想获得某个字段的数据
 >
@@ -1061,7 +1059,7 @@ StructArray的数据视图，对外提供数据查询接口，用于获取最新
   - <b>参数</b>:
     - length (int): window长度
   - <b>返回值</b>: 
-    - np.ndarray : 指定长度的数据
+    - 指定长度的 np.ndarray 结构体数组
 
 > 示例：要想获得某个字段的数据
 >
@@ -1080,7 +1078,7 @@ StructArray的数据视图，对外提供数据查询接口，用于获取最新
   - <b>参数</b>:
     - shift (int): 读取未来第shift个时间戳的数据
   - <b>返回值</b>: 
-    - dict: key: 字段, value: 对应字段的数据值
+    - numpy.void：结构体数组
 
 > 示例：要想获得下一个时间戳某个字段的数据
 >
@@ -1116,7 +1114,7 @@ StructArray的数据视图，对外提供数据查询接口，用于获取最新
   - <b>参数</b>:
     - length (int): 读取未来最近length个时间戳的数据
   - <b>返回值</b>: 
-    - np.ndarray : 指定长度的数据
+    - 指定长度的 np.ndarray 结构体数组
 
 > 示例：要想获得某个字段的数据
 >
