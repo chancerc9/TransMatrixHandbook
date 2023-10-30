@@ -34,15 +34,15 @@ Market 会更新市场数据并执行回调函数，在配置不同 matcher 时�
 
 - matcher 设为 tick / order 时, Strategy 对应的回调函数为 [on_tick](3_接口说明/策略/strategy.md#回调函数) 和 [on_market_data_update](3_接口说明/策略/strategy.md#回调函数)，其中参数 data 的数据结构：
 
-  - on_market_data_update: [DataViewStruct](3_接口说明/数据模型/set_model_view.md#DataViewStruct)
+  - on_market_data_update: Dict[code, [DataViewStruct](3_接口说明/数据模型/set_model_view.md#DataViewStruct)]
   - on_tick: 结构体数组 numpy.void，即 `DataViewStruct.get()` 得到的数据切片
 
-  > 注意，此时策略须为单标的策略，即codes中只包含一个标的。
+  > 注意，高频回测只支持单标的场景，即即codes中只包含一个标的。
 
   ```python
   class MyStrategy(Strategy):
       
-      def on_market_data_update(self, data: DataViewStruct):
+      def on_market_data_update(self, data: dict):
           ask_price_1 = data.get()['ask_price_1']
       
       def on_tick(self, tick: numpy.void):
