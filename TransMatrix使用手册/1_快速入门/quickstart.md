@@ -1,61 +1,73 @@
-# 快速入门
-TransMatrix 是一个高度自定义化的量化投研框架，可以帮助用户进行因子研究、策略研究和回测分析等任务。
+# 二，快速入门 - original
+# The following will be translated to English. (From TransQuant User Manuel.)
 
-本章将简要介绍如何使用 TransMatrix 进行因子研究和策略研究，从而帮助用户快速入门。
+# 2. Quick Start 
+
+TransMatrix is ​​a highly customized quantitative investment research framework that can help users perform tasks such as factor research, strategy research, and backtest analysis.
+
+This chapter will briefly introduce how to use TransMatrix to conduct factor research and strategy research to help users get started quickly.
 
 
 
-### 1.1 因子研究全流程
+### 1.1 The whole process of factor research (因子研究全流程)
 
-在 TransMatrix 中，因子研究涉及因子策略逻辑的编写、因子评价逻辑的编写、数据的订阅，以及其他参数的配置。
+In TransMatrix, factor research involves writing factor strategy logic, writing factor evaluation logic, data subscription, and configuration of other parameters.
 
-以下是一个简单的因子研究例子，展示了如何使用 TransMatrix 进行因子计算和分析。
+The following is a simple factor study example showing how to use TransMatrix for factor calculation and analysis.
 
 - strategy.py
     ```python
-    # 导入 TransMatrix 中的策略模块
+    # Import in `TransMatrix Strategy` module 
     from transmatrix.strategy import SignalStrategy
     from transmatrix.data_api import create_data_view, NdarrayData, DataView3d, DataView2d
     from scipy.stats import zscore
     
     class Factor(SignalStrategy):
         def init(self):
-            # 订阅数据
+            # Subscription data test
             self.subscribe_data(
                 'pv', ['default','stock_bar_1day',self.codes,'open,high,low,close', 5]
             )
-            # 设定回测发生的时间
+            # Set the time when backtesting occurs
             self.add_clock(milestones='09:25:00')
     
         def pre_transform(self):
-            # 将pv转成了一个Dict(field, dataframe)
+            # Convert `pv` into a `Dict(field, dataframe)`
             pv = self.pv.to_dataframe()
     
-            # 计算收益率ret
+            # Calculate the rate of return `ret`
             ret = (pv['close'] / pv['close'].shift(1) - 1).fillna(0)
     
-            # 保存到self.ret
+            # Save to `self.ret`
             self.ret: DataView3d = create_data_view(
                 NdarrayData.from_dataframes({'ret':reverse})
             )
-            # 和self.pv对齐时间戳
+            # Align timestamp with `self.pv`
             self.ret.align_with(self.pv)
     
         def on_clock(self):
-            # 计算因子值
+            # Calculate factor values
             ret_arr = self.ret.get_window(field='ret', length=3)
             mysignal = np.mean(ret_arr, axis=0)
-            # 更新因子值
+            # Update factor value
             self.update_signal(mysignal)
     ```
     
-    在上面代码中，我们计算了一个简单的因子，通过继承SignalStrategy来编写逻辑。
+    In the above code, we calculate a simple factor and write logic by inheriting SignalStrategy.
+    
+    in particular,
+    
+    - First, in the `init` method, subscribe to the stock price data and set the backtest occurrence time;
+    - In the `pre_transform` method, calculate the rate of return and save it to `self.ret`;
+    - In the `on_clock` method, obtain the yield data with a window size of 3 based on the current time, and calculate and update the factors.
+    
+      [在上面代码中，我们计算了一个简单的因子，通过继承(继承 - jicheng)SignalStrategy来编写逻辑。
     
     具体而言，
     
     - 首先在`init`方法中，订阅了股价数据，并设置了回测发生时间；
     - 在`pre_transform`方法中，计算收益率，并将其保存到`self.ret`中；
-    - 在`on_clock`方法中，根据当前时刻，获取窗口大小为3的收益率数据，并计算和更新因子。
+    - 在`on_clock`方法中，根据当前时刻，获取窗口大小为3的收益率数据，并计算和更新因子。] - original
     
 - evaluator.py
 
@@ -65,15 +77,15 @@ TransMatrix 是一个高度自定义化的量化投研框架，可以帮助用�
   
   class MySignalEval(SignalEvaluator):
       def init(self):
-          # 订阅数据
+          # Subscription data [订阅数据]
           self.subscribe_data(
               'pv', ['default','stock_bar_1day',self.codes,'open,high,low,close', 1]
           )
       
       def critic(self):
-          # 将pv转成了一个Dict(field, dataframe)
+          # Convert `pv` into a `Dict(field, dataframe)` [将pv转成了一个Dict(field, dataframe)]
           critic_data = self.pv.to_dataframe()
-          # 计算IC
+          # Calculate `IC`
           price = critic_data['close']
           factor = self.strategy.signal.to_dataframe()
           ret_1d = price.shift(-1) / price - 1
@@ -86,17 +98,32 @@ TransMatrix 是一个高度自定义化的量化投研框架，可以帮助用�
       return factor_panel.T.corrwith(ret_panel.T, method = 'spearman').mean()
   ```
 
-  在上面代码中，我们编写了一个简单的因子评价逻辑，通过继承SignalEvaluator来实现。
+In the above code, we wrote a simple factor evaluation logic [code?process?function?algorithm or helper?], which is implemented by inheriting [using?] SignalEvaluator.
+
+  First, we also subscribe to the data in int, and then calculate the IC value in critic.
+
+- For details on how to use configuration files to connect and run the entire process of factors, see the next section [3. Conduct factor research] (TransMatrix User Manual/3_Carry out factor research/signal.md).
+  
+  [在上面代码中，我们编写了一个简单的因子评价逻辑，通过继承SignalEvaluator来实现。
 
   首先，我们同样在int中订阅数据，然后在critic中计算IC值。
 
-- 关于如何使用配置文件将因子全流程串联和运行起来，详见接下来的[三、开展因子研究](TransMatrix使用手册/3_开展因子研究/signal.md)部分。
+- 关于如何使用配置文件将因子全流程串联和运行起来，详见接下来的[三、开展因子研究](TransMatrix使用手册/3_开展因子研究/signal.md)部分。] - original
+
+[Zài shàngmiàn dàimǎ zhōng, wǒmen biānxiěle yīgè jiǎndān de yīnzǐ píngjià luójí, tōngguò jìchéng SignalEvaluator lái shíxiàn.
+
+  Shǒuxiān, wǒmen tóngyàng zài int zhōng dìngyuè shùjù, ránhòu zài critic zhòng jìsuàn IC zhí.
+
+- Guānyú rúhé shǐyòng pèizhì wénjiàn jiāng yīnzǐ quán liúchéng chuànlián hé yùnxíng qǐlái, xiáng jiàn jiē xiàlái de [sān, kāizhǎn yīnzǐ yánjiū](TransMatrix shǐyòng shǒucè/3_kāizhǎn yīnzǐ yánjiū/signal.Md) bùfèn.] - pinyin
 
 
+### 1.2 The whole process of trading strategy research [交易策略研究全流程]
 
-### 1.2 交易策略研究全流程
+Trading strategy research involves writing trading strategy logic, writing strategy evaluation logic, data subscription, and configuration of other parameters.
 
 交易策略研究涉及交易策略逻辑的编写、策略评价逻辑的编写、数据的订阅，以及其他参数的配置。
+
+Below is a simple trading strategy example that shows how to use TransMatrix for trade order placement and profit analysis.
 
 以下是一个简单的交易策略例子，展示了如何使用 TransMatrix 进行交易下单和收益分析。
 
