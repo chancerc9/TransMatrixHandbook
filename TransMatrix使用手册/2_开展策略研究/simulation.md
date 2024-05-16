@@ -1,4 +1,17 @@
-# 策略研究
+# 四、开展策略研究 - original (sidebar)
+# Four: Conducting Strategy Research
+
+# (We will translate the following to English.)
+
+# Strategy Research (策略研究)
+
+To quickly get started with the TransMatrix system, let's take a classic futures dual moving average CTA strategy as an example and use this system to implement the entire backtesting process step by step.
+
+The dual moving average strategy is a classic CTA strategy with relatively simple logic:
+
+- If there is no current position, go long when the moving averages cross upwards (golden cross) and go short when the moving averages cross downwards (death cross).
+- If there is a short position and the moving averages cross upwards, close the short position first and then go long.
+- If there is a long position and the moving averages cross downwards, close the long position first and then go short.
 
 为了快速的上手使用 TransMatrix 系统，我们先以一个经典的期货双均线 CTA 策略为示例，使用本系统，一步步地实现整个回测程序。
 
@@ -7,32 +20,70 @@
 - 若当前有空头，并且均线金叉，则先平掉空头，再做多
 - 若当前有多头，并且均线死叉，则先平掉多头，再做空
 
-下图是逻辑示例：
+The following diagram illustrates the logic (下图是逻辑示例):
 <div align=center>
 <img width="1000" src="TransMatrix使用手册/pics/2ma.png"/>
 </div>
 <div align=center style="font-size:12px">双均线策略</div>
 <br />
 
-### 2.1 配置回测信息
+### 2.1 Configuring Backtest Information (配置回测信息)
 
-在着手编写本策略前，我们首先要明确几个基本问题：
+Before starting to write this strategy, we need to clarify a few basic questions (在着手编写本策略前，我们首先要明确几个基本问题):
 
-1、我打算回测哪一段时间区间？
+1、What time period do I intend to backtest? (我打算回测哪一段时间区间？)
 
-2、我要对哪些品种做回测？
+2、What instruments will I backtest? (我要对哪些品种做回测？)
 
-3、交易时的手续费率是多少？下单时我的订单会怎么成交？
+3、What is the trading commission rate? How will my orders be executed? (交易时的手续费率是多少？下单时我的订单会怎么成交？)
 
-4、我的策略逻辑代码，写在哪里？
+4、Where will I write my strategy logic code? (我的策略逻辑代码，写在哪里？)
 
-5、运行完回测，怎么对回测结果做可视化？
+5、After running the backtest, how will I visualize the backtest results? (运行完回测，怎么对回测结果做可视化？)
 
-这些问题的答案，需要做成配置信息，提供给 TransMatrix 系统。系统支持2种配置方式：
-- 将配置信息写在 yaml 文件
-- 将配置信息写到字典(dict)对象 
+The answers to these questions need to be configured as information provided to the TransMatrix system. The system supports two configuration methods (这些问题的答案，需要做成配置信息，提供给 TransMatrix 系统。系统支持2种配置方式):
+- Write the configuration information in a YAML file. (将配置信息写在 yaml 文件)
+- Write the configuration information in a dictionary (dict) object. (将配置信息写到字典(dict)对象 )
+
+Here, we use a YAML file as an example. We create a new file named `config.yaml` and input the following content:
 
 这里，我们以 yaml 文件为例子，进行说明。我们新建一个文件，命名为 config.yaml，并输入以下内容：
+
+```text
+# Configure Matrix component backtest information
+matrix:
+
+    mode: simulation # Indicate the current research mode is backtesting
+    span: [2021-01-01, 2022-12-31] # What time period do I intend to backtest?
+    codes: &universe [I8888.DCE,J8888.DCE,JM8888.DCE,AP8888.ZCE,MA8888.ZCE,FG8888.ZCE] # What instruments will I backtest?
+    ini_cash: 10000000 # Initial capital, modify as needed
+    fee_rate: 0.000023 # What is the trading commission rate?
+
+    market:
+        future: # Market component name
+            data: [meta_data, future_bar_10min] # Mounted market data
+            matcher: bar # How will my orders be executed?
+            account: detail # Account type is detail
+
+# Where will I write my strategy logic code?
+strategy:
+    CTA: # Component name, modify as needed
+        class:
+            - strategy.py # Strategy class file name, strategy logic component is in this file
+            - DoubleMaStrategy # Strategy class name, strategy logic is written in this class
+        kwargs: # Parameters needed by the strategy
+            config:
+                fast_window: 6
+                slow_window: 66
+    
+
+# After running the backtest, how will I visualize the backtest results?
+evaluator:
+    EVAL1: # Component name, modify as needed
+        class:
+            - evaluator.py # Strategy evaluation class file name, evaluation component is in this file
+            - TestEval # Strategy evaluation class name, evaluation logic is written in this class
+```
 
 ```text
 # 配置Matrix组件回测信息
@@ -70,7 +121,25 @@ evaluator:
             - TestEval # 策略评价类名，评价逻辑写在了这个类里
 ```
 
-根据这个 yaml 文件的内容，我们可以知道，里面有3大类配置信息，它们分别对应系统的3种组件。
+Based on the content of this YAML file, we can see that it contains three major categories of configuration information, each corresponding to three types of system components.
+
+- matrix
+    - Configures the information needed by the Matrix component, which is the system's backtesting engine.
+- strategy
+    - Configures the strategy component, where the strategy logic code is written.
+- evaluator
+    - Configures the evaluation component, which visualizes the backtest results.
+
+As shown in the diagram below, by comparing the directory structure of the current strategy and the contents of the `config.yaml` file, we can clearly see how we configure the backtest information.
+<div align=center>
+<img width="1000" src="TransMatrix使用手册/pics/sim_dir.png"/>
+</div>
+<div align=center style="font-size:12px">目录结构</div>
+<br />
+
+Now, let's look at the specific contents of these configurations (现在，让我们来分别看这些配置的具体内容).
+
+[根据这个 yaml 文件的内容，我们可以知道，里面有3大类配置信息，它们分别对应系统的3种组件。
 - matrix
   - 配置了 Matrix 组件所需要的信息，它是系统的回测引擎
 - strategy
@@ -78,114 +147,109 @@ evaluator:
 - evaluator
   - 配置评价组件，回测完怎么对回测结果做可视化
 
-如下图所示，我们把当前策略的目录结构和 config.yaml 文件的内部放在一起作对比，便能很直观地看到我们是怎么配置回测信息的。
-<div align=center>
-<img width="1000" src="TransMatrix使用手册/pics/sim_dir.png"/>
-</div>
-<div align=center style="font-size:12px">目录结构</div>
-<br />
+如下图所示，我们把当前策略的目录结构和 config.yaml 文件的内部放在一起作对比，便能很直观地看到我们是怎么配置回测信息的。] - original
 
-现在，让我们来分别看这些配置的具体内容。
+#### 2.1.1 Configuring the Matrix Engine (配置 Matrix 引擎)
 
-#### 2.1.1 配置 Matrix 引擎
-Matrix 引擎是系统的核心组件，它的功能包括： 
-- 加载回测信息
-- 加载各个组件订阅的数据
-- 管理回测流程中的事件流
-- 运行回测
-- 调用评价组件，运行评价（可选）
+The Matrix engine is the core component of the system, and its functions include:
 
-关于 Matrix 引擎更详细的说明，参见[这里](3_接口说明/Matrix/matrix.md)。为了使策略程序按照我们的预期思路运行，我们需要对 Matrix 引擎作如下配置：
+- Loading backtest information.
+- Loading data subscribed by each component.
+- Managing the event flow in the backtesting process.
+- Running the backtest.
+- Calling the evaluation component to run the evaluation (optional).
+
+For more detailed explanations about the Matrix engine, see [here](3_接口说明/Matrix/matrix.md). To make the strategy program run as we expect, we need to configure the Matrix engine as follows:
 
 ```text
 matrix:
 
-    mode: simulation # 标识当前研究模式为回测
-    span: [2021-01-01, 2022-12-31] # 我打算回测哪一段时间区间？
-    codes: &universe [I8888.DCE,J8888.DCE,JM8888.DCE,AP8888.ZCE,MA8888.ZCE,FG8888.ZCE] # 我要对哪些品种做回测？
-    ini_cash: 10000000 # 初始资金，根据需要修改
-    fee_rate: 0.000023 # 交易时的手续费率是多少？
+    mode: simulation # Indicate the current research mode is backtesting
+    span: [2021-01-01, 2022-12-31] # What time period do I intend to backtest?
+    codes: &universe [I8888.DCE,J8888.DCE,JM8888.DCE,AP8888.ZCE,MA8888.ZCE,FG8888.ZCE] # What instruments will I backtest?
+    ini_cash: 10000000 # Initial capital, modify as needed
+    fee_rate: 0.000023 # What is the trading commission rate?
 
     market:
-        future: # Market组件名称
-            data: [meta_data, future_bar_10min] # 挂载的行情数据
-            matcher: bar # 下单时我的订单会怎么成交？
-            account: detail # 账户类型为detail
+        future: # Market component name
+            data: [meta_data, future_bar_10min] # Mounted market data
+            matcher: bar # How will my orders be executed?
+            account: detail # Account type is detail
 ```
 
-如上所示，这里，我们将 mode 设置为 simulation，代表当前模式为策略研究。TransMatrix 支持2种研究模式：1是策略研究，2是因子研究。因子研究模式，相关介绍参见[第三章](TransMatrix使用手册/3_开展因子研究/signal.md)，策略研究模式需要将 mode 设为 simulation。
+As shown above, here we set the mode to simulation, indicating the current mode is strategy research. TransMatrix supports two research modes: strategy research and factor research. For the factor research mode, see [Chapter Three](3_接口说明/Matrix/matrix.md). The strategy research mode requires setting the mode to simulation.
 
-之后配置回测区间，这里我们选择回测开始时间为2021年1月1日，结束时间为2022年12月31日收盘。
+Then, configure the backtest period. Here, we choose the backtest start time as January 1, 2021, and the end time as the close of December 31, 2022.
 
-接下来是配置回测品种有哪些，这里我们提供了一个 list，里面包含了诸如铁矿石、焦炭、焦煤等品种的主力连续合约。
+Next is configuring which instruments to backtest. Here, we provide a list that includes the main continuous contracts for iron ore, coke, coal, and other commodities.
 ```text
-    codes: &universe [I8888.DCE,J8888.DCE,JM8888.DCE,AP8888.ZCE,MA8888.ZCE,FG8888.ZCE] # 我要对哪些品种做回测？
+    codes: &universe [I8888.DCE,J8888.DCE,JM8888.DCE,AP8888.ZCE,MA8888.ZCE,FG8888.ZCE] # What instruments will I backtest?
 ```
-
-除了以 list 作为回测品种的输入，系统也支持 pkl 文件作为输入，pkl文件里存放的是 list 对象，此时写法如下：
-
+In addition to using a list as input for the backtest instruments, the system also supports using a pkl file as input, which contains a list object. The configuration in this case is as follows:
 ```text
     codes: &universe custom_universe.pkl
 ```
 
-这里定义了一个变量 universe，它的值就是其后面的品种列表，这样就可以在 yaml 文件的其他地方使用 universe 变量来代替整个列表。
+Here, we define a variable `universe`, which holds the list of instruments, allowing us to use the `universe` variable elsewhere in the YAML file to replace the entire list.
 
-再下一行，配置了账户的初始资金，这里设的是1000万。
+Next, we configure the initial capital of the account, set here to 10 million.
 ```text
-    ini_cash: 10000000 # 初始资金，根据需要修改
+    ini_cash: 10000000 # Initial capital, modify as needed
 ```
 
-之后配置的是交易费率，这里设定的是单边成交万分之0.23
+Then, configure the trading fee rate, set here to 0.0023%.
 ```text
-    fee_rate: 0.000023 # 交易时的手续费率是多少？
+    fee_rate: 0.000023 # What is the trading commission rate?
 ```
 
-接下来，嵌套配置了 market 信息，包括以下3部分：
-- 订阅的行情数据
+Next, nest the market information configuration, which includes the following three parts:
+
+- Subscribed market data
 ```text
-            data: [meta_data, future_bar_10min] # 挂载的行情数据
+            data: [meta_data, future_bar_10min] # Mounted market data
 ```
-    策略所需要用到的行情数据，策略组件会在行情数据更新时回调方法 on_market_update，行情数据的频率决定了 on_market_update 的执行频率。若订阅的行情数据是日频，则 on_market_update 每个交易日都会被调用，若是10分钟频率，则该方法每隔10分钟都会调用。
+
+The market data needed by the strategy will trigger the `on_market_update` method of the strategy component when updated. The frequency of the market data determines the execution frequency of `on_market_update`. If the subscribed market data is daily, `on_market_update` will be called every trading day. If the frequency is 10 minutes, the method will be called every 10 minutes, and so on.
+
+Here, we subscribe to the `future_bar_10min` table in the `meta_data` database, which stores the 10-minute Bar market data for futures. For detailed explanations about the database API, see [the Database section](3_接口说明/数据库/DatabaseAPI.md). For detailed explanations about the DataApi, see [the DataApi section](3_接口说明/数据模型/set_model_view.md).
+
+- The Matrix engine's order matcher
+```text
+            matcher: bar # How will my orders be executed?
+```
+
+The matcher informs the Matrix engine how the strategy's trading orders should be matched in the market. Here, the configured matcher is the k-line matcher, with the following matching mechanism:
+
+If the order price for buying (selling) exceeds the upper (lower) price limit, the order is rejected and not matched.
+If the order price for buying (selling) exceeds the closing price of the current Bar, the order is fully matched; otherwise, it is adjusted to a pending order and continues to be matched in the next Bar.
+If the pending order remains unmatched by the close, it is canceled.
+The k-line matcher is a commonly used matcher supported by the system. Additionally, the system supports daily/snapshot and Orderflow matching. Developers can develop their own matchers for specific scenarios by overloading a few methods of the matcher base class `Matcher`. For detailed explanations of matchers, see [here](4_其他组件/market_components.md).
+
+- The account type of the strategy (策略的账户类型)
+```text
+            account: detail # Account type is detail
+```
+    Here, the account mode configured is `detail`. The system supports two types of account modes:
     
-    这里，我们订阅的是 meta_data数据库里的future_bar_10min表，该表存放了期货10分钟的 Bar 行情数据。关于数据库 API 的详细说明，参见说明文档[数据库](3_接口说明/数据库/DatabaseAPI.md)部分，关于 DataApi 的详细说明，参见说明文档[DataApi](3_接口说明/数据模型/set_model_view.md) 部分。
-
-- Matrix 引擎的订单撮合器
-```text
-            matcher: bar # 下单时我的订单会怎么成交？
-```
-
-撮合器的目的是告诉 Matrix 引擎，策略的交易订单在市场上是应该如何进行撮合成交的。这里配置的是 k 线撮合器，它的撮合机制如下：
--  当委托买单（卖单）价格超过涨停价（跌停价），则订单被拒绝，不予撮合成交；
--  当委托买单（卖单）价格大于当前 Bar 的收盘价时，订单全部成交，否则调整为挂单，等待下一个 Bar 继续撮合；
--  若到收盘时委托单依旧未成交，则取消该委托单。
-
-k 线撮合器是系统所支持的一种常用的撮合器，此外，系统还支持 日频 / 快照 与 Orderflow 撮合成交。开发者可根据特定场景开发自己的撮合器，只需要重载撮合器基类 Matcher的几个方法即可实现。撮合器的具体说明参见[这里](4_其他组件/market_components.md)。
-
-
-- 策略的账户类型
-```text
-            account: detail # 账户类型为 detail
-```
-
-    这里配置的账户模式是 detail，系统支持 2 种账户模式：
-    
-    - **base** 账户，不做验资验券，**cash 属性不作维护**
-    - **detail** 账户，将根据市场属性进行验资验券，具体地：
+    - **base** account, does not check for cash or securities, **cash attribute is not maintained.**
+    - **detail** account, checks for cash and securities according to market properties, specifically:
       -   股票账户 StockAccount
-          -   交易规则：
-              -   T+1交易
-              -   每日结算
-          -   验资验券规则：
-              -   不允许融券做空（禁止卖开 和 买平）
-              -   **挂单不占用资金和头寸（成交后调整现金）**
-              -   不允许平今
+          -   Trading rules (交易规则):
+              -   T+1 trading
+              -   Daily settlement (每日结算)
+          -   Cash and securities check rules (验资验券规则):
+              -   Short selling is not allowed (forbidden to sell short or buy to cover)
+              -   **Pending orders do not occupy funds or positions (adjust cash after transaction) **
+              -   Same-day sell orders are not allowed
       -   期货账户 FuturesAccount
-          -   交易规则：
-              -   某合约有成交或者每日收盘结算时，更新保证金占用
-              -   每日结算
-          -   验资验券规则：
-              -   **对某一合约，挂单不占用资金和头寸**
-              -   对某一合约，有成交时更新该合约的头寸和保证金占用
+          -   Trading rules:
+              -   Updates margin occupation when a contract is traded or at the end of each day
+              - Daily settlement
+          -   Cash and securities check rules:
+              -   **Pending orders do not occupy funds or positions**
+              -   Updates the position and margin occupation when a contract is traded
+
+The default account mode configured by the system is the detail mode. Based on a comprehensive consideration of system performance and business accuracy, we have established the above cash and securities check rules. **Please be aware when using.**
 
 系统的默认配置的账户模式是 detail 模式，基于系统性能和业务准确性的综合考虑，我们制定了上述验资验券规则，**使用时请知悉**。
 
