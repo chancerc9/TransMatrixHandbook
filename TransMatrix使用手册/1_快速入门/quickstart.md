@@ -98,30 +98,36 @@ The following is a simple factor study example showing how to use TransMatrix fo
       return factor_panel.T.corrwith(ret_panel.T, method = 'spearman').mean()
   ```
 
-In the above code, we wrote a simple factor evaluation logic [code?process?function?algorithm or helper?], which is implemented by inheriting [using?] SignalEvaluator.
 
-  First, we also subscribe to the data in int, and then calculate the IC value in critic.
+In the above code, we wrote a simple factor evaluation logic by inheriting from SignalEvaluator.
+
+  First, we also subscribed to data in `init`, and then calculated the IC value in `critic`.
 
 - For details on how to use configuration files to connect and run the entire process of factors, see the next section [3. Conduct factor research] (TransMatrix User Manual/3_Carry out factor research/signal.md).
   
-  [在上面代码中，我们编写了一个简单的因子评价逻辑，通过继承SignalEvaluator来实现。
+在上面代码中，我们编写了一个简单的因子评价逻辑，通过继承SignalEvaluator来实现。
 
   首先，我们同样在int中订阅数据，然后在critic中计算IC值。
 
-- 关于如何使用配置文件将因子全流程串联和运行起来，详见接下来的[三、开展因子研究](TransMatrix使用手册/3_开展因子研究/signal.md)部分。] - original
+- 关于如何使用配置文件将因子全流程串联和运行起来，详见接下来的[三、开展因子研究](TransMatrix使用手册/3_开展因子研究/signal.md)部分。
 
-[Zài shàngmiàn dàimǎ zhōng, wǒmen biānxiěle yīgè jiǎndān de yīnzǐ píngjià luójí, tōngguò jìchéng SignalEvaluator lái shíxiàn.
+Zài shàngmiàn dàimǎ zhōng, wǒmen biānxiěle yīgè jiǎndān de yīnzǐ píngjià luójí, tōngguò jìchéng SignalEvaluator lái shíxiàn.
 
   Shǒuxiān, wǒmen tóngyàng zài int zhōng dìngyuè shùjù, ránhòu zài critic zhòng jìsuàn IC zhí.
 
-- Guānyú rúhé shǐyòng pèizhì wénjiàn jiāng yīnzǐ quán liúchéng chuànlián hé yùnxíng qǐlái, xiáng jiàn jiē xiàlái de [sān, kāizhǎn yīnzǐ yánjiū](TransMatrix shǐyòng shǒucè/3_kāizhǎn yīnzǐ yánjiū/signal.Md) bùfèn.] - pinyin
+- Guānyú rúhé shǐyòng pèizhì wénjiàn jiāng yīnzǐ quán liúchéng chuànlián hé yùnxíng qǐlái, xiáng jiàn jiē xiàlái de [sān, kāizhǎn yīnzǐ yánjiū](TransMatrix shǐyòng shǒucè/3_kāizhǎn yīnzǐ yánjiū/signal.Md) bùfèn.
 
 
 ### 1.2 The whole process of trading strategy research [交易策略研究全流程]
+### 1.2 Trading Strategy Research Full Process
+
+Trading strategy research involves the development of trading strategy logic, strategy evaluation logic, data subscription, and other parameter configurations.
 
 Trading strategy research involves writing trading strategy logic, writing strategy evaluation logic, data subscription, and configuration of other parameters.
 
 交易策略研究涉及交易策略逻辑的编写、策略评价逻辑的编写、数据的订阅，以及其他参数的配置。
+
+Below is a simple trading strategy example that demonstrates how to use TransMatrix for order execution and return analysis.
 
 Below is a simple trading strategy example that shows how to use TransMatrix for trade order placement and profit analysis.
 
@@ -131,24 +137,24 @@ Below is a simple trading strategy example that shows how to use TransMatrix for
 
   ```python
   from transmatrix import Strategy
-  # 策略逻辑组件
+  # Strategy logic component (策略逻辑组件)
   class TestStra(Strategy):
       def init(self):
-          # 订阅数据
+          # Subscribe to data
           self.subscribe_data(
               'macd', ['demo', 'factor_data__stock_cn__tech__1day__macd', self.codes, 'value', 10]
           )
           self.max_pos = 300
       
-      #回调执行逻辑： 行情更新时
+      # Callback execution logic: when market data updates (回调执行逻辑： 行情更新时)
       def on_market_data_update(self, market_data):
-          # 获取最近三天样本空间内的macd值，并排序
+          # Get and sort the macd values of the most recent three-day sample space
           macd = self.macd.query(time=self.time, periods=3)['value'].mean().sort_values() 
-          # macd值最小的两只股票作为买入股票
+          # The two stocks with the smallest macd values are selected for buying (macd值最小的两只股票作为买入股票)
           buy_codes = macd.iloc[:2].index 
   
           for code in buy_codes:
-              # 获取某股票的仓位
+              # Get the position of a certain stock
               pos = self.account.get_netpos(code)
   
               if  pos < self.max_pos:
@@ -162,6 +168,13 @@ Below is a simple trading strategy example that shows how to use TransMatrix for
                   )
   ```
   
+  In the above code, we implemented a simple trading strategy by inheriting from Strategy.
+  
+  Specifically,
+  
+  - First, in the `init` method, we subscribed to the macd factor data;
+  - In the `on_market_data_update method`, at the current time (i.e., when market_data is updated), we buy the two stocks with the smallest macd values;
+
   在上面代码中，我们实现了一个简单的交易策略，通过继承Strategy来编写逻辑。
   
   具体而言，
@@ -182,12 +195,18 @@ Below is a simple trading strategy example that shows how to use TransMatrix for
           pass
   
       def critic(self):
-          # 获得每日损益
+          # Get daily profit and loss (获得每日损益)
           pnl = self.get_pnl()      
           print(pnl)
           
           return np.nansum(pnl)
   ```
+
+  In the above code, we wrote a simple strategy evaluation logic by inheriting from SimulationEvaluator.
+  
+  First, in the critic method, we obtained the daily profit and loss of the strategy run through self.get_pnl() and summed it to get the total pnl.
+
+- For details on how to use configuration files to connect and run the factor full process, see the next section [2. Conducting Strategy Research](TransMatrix User Manual/2_Conducting_Strategy_Research/simulation.md).
 
   在上面代码中，我们编写了一个简单的策略评价逻辑，通过继承SimulationEvaluator来实现。
 
