@@ -754,7 +754,7 @@ matrix.eval() # 对回测结果作评价
 
 运行本单元格，输出以下内容：
 <div align=center>
-<img width="1000" src="TransMatrix使用手册/pics/sim_stock.png"/>
+<img width="1000" src="TransMatrixHandbook/TransMatrix使用手册/pics/sim_stock.png"/>
 </div>
 <div align=center style="font-size:12px">回测结果</div>
 <br />
