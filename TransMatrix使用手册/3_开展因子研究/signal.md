@@ -1,42 +1,43 @@
-# 因子研究
+# Factor Research (因子研究) - Important !!
 
-和策略研究一样，因子研究包含 3 种主要的组件。
-- matrix
-  - 配置了 Matrix 组件所需要的信息，它是系统的计算引擎
-- strategy
-  - 配置因子计算组件，写因子计算逻辑代码的地方
-- evaluator
-  - 配置评价组件，因子数据如何作单因子分析，并展示结果
+Similar to strategy research, factor research comprises *three* main components:
+- **matrix**
+  - Configures the *information* required by the *Matrix component*, which serves as the *system's calculation engine*
+    (配置了 Matrix 组件所需要的信息，它是系统的计算引擎).
+- **strategy**
+  - Configures the *factor calculation* component, where the factor calculation logic code is written.
+    (配置因子计算组件，写因子计算逻辑代码的地方).
+- **evaluator**
+  - Configures the *evaluation component*, detailing how to perform *single-factor analysis* on *factor data* and *display* the results.
+    (配置评价组件，因子数据如何作单因子分析，并展示结果).
 
-本章，我们以一个简单的反转因子为示例，介绍如何使用 TransMatrix 系统来实现诸如：因子计算、因子评价、因子入库、因子定时更新等因子研究的各个功能。
+In this chapter, we will use a simple reversal factor as an example to demonstrate how to use the TransMatrix system to accomplish various functionalities of factor research, such as factor calculation, factor evaluation, factor storage, and scheduled factor updates.
+  (本章，我们以一个简单的反转因子为示例，介绍如何使用 TransMatrix 系统来实现诸如：因子计算、因子评价、因子入库、因子定时更新等因子研究的各个功能。)
 
-### 3.1 如何计算因子
+### 3.1 How to Calculate a Factor (如何计算因子)
 
-反转因子的逻辑较为简单，首先计算个股的日度收益率，再取5日均值并取负值，最后在截面上计算 zscore，zscore的值作为因子值。
+The logic behind the reversal factor is relatively simple: (1) **first**, calculate the *daily returns* of *individual stocks*, (2) **then** take the *5-day moving average* and [negate] it, and (3) **finally** compute the *z-score in the cross-section*, using the **z-score** as the **factor value**.
+(反转因子的逻辑较为简单，首先计算个股的日度收益率，再取5日均值并取负值，最后在截面上计算 zscore，zscore的值作为因子值。)
 
-#### 3.1.1 配置相关信息
-为了计算该因子，我们需要配置相关信息，以明确以下几个问题：
+#### 3.1.1 Configuring Relevant Information (配置相关信息)
+To calculate this factor, we need to configure relevant information to clarify the following questions:
 
-1、我打算生成哪一段时间区间的因子？
+1. What time period do I intend to generate the factor for?
+2. What stocks are included in the factor's cross-section?
+3. Where is the factor data calculation logic written?
+4. Where is the factor data saved?
+5. After obtaining the factor data, how do I perform single-factor analysis and visualize the results?
 
-2、因子在截面上包含哪些股票？
-
-3、因子数据的计算逻辑写在哪里？
-
-4、因子数据保存到哪里？
-
-5、有了因子数据后，如何做单因子分析，分析结果怎么可视化？
-
-与策略研究一样，这些配置信息既可以写在字典 (dict) 对象里，也可以配置在 yaml 文件中。我们新建一个 yaml 文件，命名为 config.yaml，并输入以下内容：
+Similar to strategy research, these configurations can either be written in a dictionary (dict) object or configured in a YAML file. We will create a new YAML file named `config.yaml` and enter the following content:
 ```text
 matrix:
-    mode: signal # 研究模式为因子研究
-    span: [2018-01-01, 2021-12-30] # 我打算生成哪一段时间区间的因子？
+    mode: signal  # Research mode is factor research
+    span: [2018-01-01, 2021-12-30]  # Time period for generating the factor
     codes: '*' 
-    universe: [meta_data, critic_data, is_zz500] # 因子在截面上包含哪些股票？
-    save_signal: False # 因子数据保存到哪里？
+    universe: [meta_data, critic_data, is_zz500]  # Stocks included in the factor's cross-section
+    save_signal: False  # Where to save the factor data
 
-strategy: # 因子数据的计算逻辑写在哪里？
+strategy:  # Where to write the factor data calculation logic
     reverse_factor:
         class: 
             - strategy.py 
@@ -44,14 +45,18 @@ strategy: # 因子数据的计算逻辑写在哪里？
 
 ```
 
-由于我们只需要计算因子数据，而不作因子评价，故不需要配置评价组件。
+Since we only need to calculate the factor data and not evaluate it, there is no need to configure the evaluation component.
+(由于我们只需要计算因子数据，而不作因子评价，故不需要配置评价组件。)
 
-在 matrix 部分的配置，我们将研究模式设为 signal，代表是因子研究模式，计算区间是2018年1月1日到2021年12月30日。因子计算的样本空间是中证500，它是一个动态的股票池，由 meta_data 库的 critic_data 表的 is_zz500字段给定，它的取值为0或1，若为1则股票在当前截面属于中证500。关于code 和 universe 的配置的更多说明，参见[这里](3_接口说明/Matrix/matrix.md)。
+In the matrix configuration, we set the research mode to `signal`, indicating factor research mode, with a calculation period from January 1, 2018, to December 30, 2021. The sample space for factor calculation is the CSI 500, a dynamic stock pool defined by the `is_zz500` field in the `critic_data` table from the `meta_data` library. The value of this field is either 0 or 1; if it is 1, the stock belongs to the CSI 500 at the current cross-section. For more details on configuring `code` and `universe`, refer to [here](3_接口说明/Matrix/matrix.md).
 
-在 strategy 部分的配置，我们的因子计算逻辑，写在 strategy.py 文件的 ReverseSignal 类中。
+(在 matrix 部分的配置，我们将研究模式设为 signal，代表是因子研究模式，计算区间是2018年1月1日到2021年12月30日。因子计算的样本空间是中证500，它是一个动态的股票池，由 meta_data 库的 critic_data 表的 is_zz500字段给定，它的取值为0或1，若为1则股票在当前截面属于中证500。关于code 和 universe 的配置的更多说明，参见[这里](3_接口说明/Matrix/matrix.md)。)
 
-#### 3.1.2 实现因子计算组件
-我们新建一个 strategy.py 文件，输入以下代码：
+In the strategy configuration, the factor calculation logic is written in the `ReverseSignal` class in the `strategy.py` file.
+(在 strategy 部分的配置，我们的因子计算逻辑，写在 strategy.py 文件的 ReverseSignal 类中。)
+
+#### 3.1.2 Implementing the Factor Calculation Component (实现因子计算组件)
+We will create a new `strategy.py` file and enter the following code:
 ```python
 from transmatrix.strategy import SignalStrategy
 from transmatrix.data_api import create_data_view, NdarrayData, DataView3d
@@ -68,9 +73,9 @@ class ReverseSignal(SignalStrategy):
 
     def pre_transform(self):
         pv = self.pv.to_dataframe()
-        ret = (pv['close'] / pv['close'].shift(1) - 1).fillna(0) # 计算日度收益率
-        reverse = -ret.rolling(window = 5, min_periods = 5).mean().fillna(0) # 取5日均值，并取负值
-        reverse = zscore(reverse, axis = 1, nan_policy='omit') # 在截面上计算zscore作为因子值
+        ret = (pv['close'] / pv['close'].shift(1) - 1).fillna(0) # (1) Calculate daily returns 
+        reverse = -ret.rolling(window = 5, min_periods = 5).mean().fillna(0) # (2) Take 5-day moving average and negate
+        reverse = zscore(reverse, axis = 1, nan_policy='omit') # (3) Calculate z-score in the cross-section [and use the calculated z-score] as the factor value
         
         self.reverse: DataView3d = create_data_view(
             NdarrayData.from_dataframes({'reverse':reverse})
@@ -82,21 +87,23 @@ class ReverseSignal(SignalStrategy):
         self.update_signal(self.reverse.get('reverse'))
 ```
 
-上述代码中，我们定义了一个 ReverseSignal 类，它继承自 SignalStrategy。SignalStrategy 是系统因子计算的基类，因子计算类都要继承它。关于 SignalStrategy 的详细说明，参见[这里](5_定制化模块_截面因子开发/signal.md)。
+In the above code, we define a **`ReverseSignal`** class that inherits from **`SignalStrategy`**. **`SignalStrategy`** is the base class for factor calculation in the system, and all factor calculation classes must inherit from it. For more details on **`SignalStrategy`**, refer to [here](5_定制化模块_截面因子开发/signal.md).
 
-ReverseSignal 类重载了以下 3 个方法：
-- init 方法，初始化因子计算组件时将调用本方法。这里添加了一个因子更新定时调度器，时间设置为 8:30，代表每个交易日的 8:30 会触发调度器调用 on_clock 方法。另外，还订阅了股票的日线行情数据（来源于demo库的stock_bar_1day表，字段是高开低收，筛选的股票与 Matrix 引擎配置的样本空间一样，即中证500）。
-- pre_transform 方法，因子计算前将调用本方法，通常用于对订阅数据作向量化计算，以提高效率。这里，我们实现了本节开头提到的反转因子的计算逻辑。
-- on_clock 方法，每个交易日的 8：30，将调用本方法。由于 reverse 数据已在 pre_transform 计算好，这里只需要取出，并更新到 signal 属性中，该属性是用于存放单个因子数据的容器。
+The **`ReverseSignal`** class overrides the following three methods:
+- **`init`** method: This method is called when initializing the factor calculation component. Here, we add a factor update scheduler set to 8:30, meaning it will trigger the **`on_clock`** method at 8:30 every trading day. We also subscribe to daily stock market data (from the **`demo`** library's **`stock_bar_1day`** table, including fields for open, high, low, and close prices, and the stocks filtered to match the sample space configured in the Matrix engine, i.e., the CSI 500).
+- **`pre_transform`** method: This method is called before factor calculation, typically used for vectorized calculations on subscribed data to improve efficiency. Here, we implement the reversal factor calculation logic mentioned at the beginning of this section.
+- **`on_clock`** method: This method is called at 8:30 every trading day. Since the **`reverse`** data is already calculated in **`pre_transform`**, we only need to retrieve it and update it in the **`signal`** attribute, which is a container for storing single-factor data.
 
-#### 3.1.3 执行因子计算
+(上述代码中，我们定义了一个 ReverseSignal 类，它继承自 SignalStrategy。SignalStrategy 是系统因子计算的基类，因子计算类都要继承它。关于 SignalStrategy 的详细说明，参见[这里](5_定制化模块_截面因子开发/signal.md)。)
 
-我们新建一个 ipynb 文件，命名为 run.ipynb。新建一个代码单元格，输入以下代码：
+3.1.3 Executing Factor Calculation (执行因子计算)
+
+We will create a new **`.ipynb`** file named **`run.ipynb`**. In a new code cell, enter the following code:
 ```python
 from transmatrix.workflow.run_yaml import run_matrix
 mat = run_matrix('config.yaml')
 ```
-系统计算完因子数据后，将输出以下内容：
+After the system completes the factor data calculation, it will output the following content:
 ```text
 Out:
     loading data meta_data__critic_data__is_zz500 from datacache.
@@ -104,7 +111,7 @@ Out:
     Updating private cache meta_data__critic_data__is_zz500: dataset_ca21686c-80ce-4e96-bd95-ceb53f03895c ....
     loading data demo__stock_bar_1day__open,high,low,close from datacache.
 ```
-我们可以查看计算的因子数据：
+We can check the calculated factor data: (**notice** for ["how to check the calculated factor data"])
 ```python
 strategy = mat.strategies['reverse_factor']
 strategy.signal.to_dataframe()
@@ -112,8 +119,10 @@ strategy.signal.to_dataframe()
 <div align=center>
 <img width="1000" src="TransMatrix使用手册/pics/signal_factor.png"/>
 </div>
-<div align=center style="font-size:12px">因子数据</div>
+<div align=center style="font-size:12px">Factor Data</div>
 <br />
+
+Note that the **`signal`** attribute of the **`strategy`** object is a **`DataView2d`**, while the subscribed market data (**`pv`**) of the **`strategy`** object is a **`DataView3d`** type. **`DataView3d`** is a 3D data view providing various data query interfaces for `**Data3d`**; **`DataView2d`** is a 2D data view providing data query interfaces for **`Data2d`**. For more details on **`Data3d`**, **`Data2d`**, **`DataView2d`**, and **`DataView3d`**, refer to [here](3_接口说明/数据模型/set_model_view.md).
 
 注意，这里的 strategy 对象的 signal 属性，是一个 DataView2d，而 strategy 对象订阅的行情数据 pv，它是一个 DataView3d 类型。DataView3d 是一个 3d 数据视图，针对 Data3d 提供了诸多的数据查询接口；DataView2d 是一个 2d 数据视图，针对 Data2d 提供了数据查询接口。关于 Data3d, Data2d, DataView2d, DataView3d 等类的详细说明，参见[这里](3_接口说明/数据模型/set_model_view.md)。
 ```python
