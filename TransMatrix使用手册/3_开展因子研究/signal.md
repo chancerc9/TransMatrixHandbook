@@ -1,3 +1,5 @@
+# Chapter 5: Conducting Factor Research (五、开展因子研究)
+
 # Factor Research (因子研究) - Important !!
 
 Similar to strategy research, factor research comprises *three* main components:
