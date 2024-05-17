@@ -119,10 +119,12 @@ strategy = mat.strategies['reverse_factor']
 strategy.signal.to_dataframe()
 ```
 <div align=center>
-<img width="1000" src="TransMatrix使用手册/pics/signal_factor.png"/>
+<img width="1000" alt="signal_factor" src="https://github.com/chancerc9/TransMatrixHandbook/assets/121725978/c6593184-7bb6-4eac-a1ba-fb21ec621360">
 </div>
 <div align=center style="font-size:12px">Factor Data</div>
 <br />
+
+<img width="1000" src="TransMatrix使用手册/pics/signal_factor.png"/>
 
 Note that the **`signal`** attribute of the **`strategy`** object is a **`DataView2d`**, while the subscribed market data (**`pv`**) of the **`strategy`** object is a **`DataView3d`** type. **`DataView3d`** is a 3D data view providing various data query interfaces for `**Data3d`**; **`DataView2d`** is a 2D data view providing data query interfaces for **`Data2d`**. For more details on **`Data3d`**, **`Data2d`**, **`DataView2d`**, and **`DataView3d`**, refer to [here](3_接口说明/数据模型/set_model_view.md).
 
@@ -203,10 +205,12 @@ For more information on the `SignalEvaluator` base class, refer to [here](5_定�
 
 We run the cell in run.ipynb again, obtaining the following output:
 <div align=center>
-<img width="1000" src="TransMatrix使用手册/pics/signal_eval.png"/>
+<img width="1000" alt="signal_eval" src="https://github.com/chancerc9/TransMatrixHandbook/assets/121725978/4de72ec1-51ca-4a59-bc86-6d0a274a3b40">
 </div>
 <div align=center style="font-size:12px">Factor Evaluation</div>
 <br />
+
+<img width="1000" src="TransMatrix使用手册/pics/signal_eval.png"/>
 
 This completes the evaluation of the reversal factor from section 3.1. For demonstration purposes, we only calculate and display the IC value of the factor. Users can add more logic to implement content such as group analysis, regression analysis, turnover rate analysis, and correlation analysis for single-factor analysis. The system also provides multiple sets of factor evaluation templates, see [Factor Service - Evaluation Templates](8_测例代码/因子服务-评价模板.md).
 
@@ -237,6 +241,12 @@ This saves the reversal factor data calculated in section 3.1 to the `temp_facto
 [**Another way to save factor data**] is to (if) *[specify the target table name in the configuration information]*, (then) and the *Matrix engine will [automatically] save the calculated factor data*. As shown in the figure below:
 
 <div align=center>
+<img width="800" alt="signal_eval" src="https://github.com/chancerc9/TransMatrixHandbook/assets/121725978/4b192fcb-f53b-4004-84f3-245a46bc31ea">
+</div>
+<div align=center style="font-size:12px">Factor Saving</div>
+<br />
+
+<div align=center>
 <img width="800" src="TransMatrix使用手册/pics/save_signal.png"/>
 </div>
 <div align=center style="font-size:12px">Factor Saving</div>
@@ -254,6 +264,12 @@ Suppose the calculated factor data passes the factor evaluation test and needs t
 
 A complete stock multi-factor strategy typically includes the following process:
 <div align=center>
+<img width="1000" alt="sig_all" src="https://github.com/chancerc9/TransMatrixHandbook/assets/121725978/fe5240b8-76a8-45ae-8f39-c5cecd938868">
+</div>
+<div align=center style="font-size:12px">Multi-Factor Strategy Research Process(多因子策略研究流程)</div>
+<br />
+
+<div align=center>
 <img width="1000" src="TransMatrix使用手册/pics/sig_all.png"/>
 </div>
 <div align=center style="font-size:12px">Multi-Factor Strategy Research Process(多因子策略研究流程)</div>
@@ -268,11 +284,16 @@ Factor calculation and storage are the first part of the entire example. To dist
 
 First, we select the following 10 factors and assume that they are all valid alpha factors without additional single-factor tests.
 <div align=center>
-<img width="500" src="TransMatrix使用手册/pics/10factor.png"/>
+<img width="500" alt="10factor" src="https://github.com/chancerc9/TransMatrixHandbook/assets/121725978/e0513e4b-5549-41a5-bbe6-e1185b40fb81">
 </div>
 <div align=center style="font-size:12px">10 Factors and Descriptions (10个因子及说明)</div>
 <br />
 
+<div align=center>
+<img width="500" src="TransMatrix使用手册/pics/10factor.png"/>
+</div>
+<div align=center style="font-size:12px">10 Factors and Descriptions (10个因子及说明)</div>
+<br />
 We will create a new `config.yaml` file to store the relevant configuration information.
 ```text
 matrix:
@@ -464,6 +485,12 @@ print('Data loaded successfully - 数据完成加载')
 display(factor_data)
 ```
 <div align=center>
+<img width="1000" alt="signal_whole_1" src="https://github.com/chancerc9/TransMatrixHandbook/assets/121725978/bed32f34-f04f-42d8-b0ae-bda5b9640ecd">
+</div>
+<div align=center style="font-size:12px">Reading Factor Data (读取因子数据)</div>
+<br />
+
+<div align=center>
 <img width="1000" src="TransMatrix使用手册/pics/signal_whole_1.png"/>
 </div>
 <div align=center style="font-size:12px">Reading Factor Data (读取因子数据)</div>
@@ -547,6 +574,12 @@ At this point, we have completed the model training and saved the model locally.
 This part includes two steps: the first is signal generation, similar to factor calculation, where we load factor data, use the model to predict signals, and save them to the database; the second is signal evaluation, where we add an evaluation component and implement the evaluation logic to evaluate the signals. Considering the length of the evaluation component code, it is not introduced here. You can refer to the system's sample template "Research Full Process" for more details. Below is the result of the signal evaluation:
 (这部分包含 2 个步骤，1 是信号生成，这与因子计算类似，我们加载因子数据，使用模型预测得到信号并保存到数据库里；2 是信号评价，添加评价组件并实现评价逻辑，便可以对信号进行评价。考虑到评价组件的代码篇幅较长，这里不作介绍，具体可以参照系统附带的测例模板“研究全流程”。下图是信号评价的结果：)
 <div align=center>
+<img width="1000" alt="signal_whole_2" src="https://github.com/chancerc9/TransMatrixHandbook/assets/121725978/6a694994-0b12-43d9-b8dc-62bdcebd3d35">
+</div>
+<div align=center style="font-size:12px">Signal Evaluation(信号评价)</div>
+<br />
+
+<div align=center>
 <img width="1000" src="TransMatrix使用手册/pics/signal_whole_2.png"/>
 </div>
 <div align=center style="font-size:12px">Signal Evaluation(信号评价)</div>
@@ -556,6 +589,11 @@ This part includes two steps: the first is signal generation, similar to factor 
 
 After the signal evaluation, we believe the signal is effective and can be further developed into a stock strategy. Here, we rank the stocks by signal size in each period, select the top 50 stocks with the highest signal values, and buy them equally at 2:30 PM. The strategy code and evaluation component code can be referred to in the system template sample. The backtesting results are as follows:
 (在经过信号评价后，我们认为信号是有效的，可以进一步加工成一个股票策略。这里，我们每期按信号大小，对股票作排序，选取前 50 只信号值最大的股票，14点30分等权买入。策略代码和评价组件代码，可参考系统模板测例。运行完成输出结果如下：)
+<div align=center>
+<img width="1000" alt="signal_whole_3" src="https://github.com/chancerc9/TransMatrixHandbook/assets/121725978/561cd49e-3c1a-4c26-8ff6-29b6fc5b05e0"></div>
+<div align=center style="font-size:12px">Backtesting Results(回测结果)</div>
+<br />
+
 <div align=center>
 <img width="1000" src="TransMatrix使用手册/pics/signal_whole_3.png"/>
 </div>
