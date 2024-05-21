@@ -587,3 +587,80 @@ This completes the translation of the provided text while retaining the original
 
 Overall, the code is well-written, logically sound, and follows good practices in Python programming. It demonstrates a clear workflow for factor calculation, model training, signal generation, and backtesting, making it a robust implementation for financial data analysis and strategy development.
 
+Extra ChatGPT Comments:
+
+### Explanation of "subscribe" in Python Terminology
+
+In the context of the provided code and the `TransMatrix` framework, "subscribe" refers to the process of registering or setting up a connection to receive specific data streams required for the factor calculation. This term is commonly used in event-driven programming and frameworks dealing with real-time data feeds, such as financial data.
+
+### How "subscribe" Works in the Provided Code
+
+In the provided `ReverseSignal` class, the `subscribe_data` method is used within the `init` method. Here's a detailed explanation:
+
+#### 1. **Purpose of `subscribe_data` Method**:
+The `subscribe_data` method is used to specify which data the strategy needs to receive and process. This setup ensures that the necessary data is available for factor calculation when the strategy runs.
+
+#### 2. **Parameters of `subscribe_data`**:
+The method typically takes several arguments that define the data source, the data fields required, and any additional settings. For example:
+
+```python
+self.subscribe_data(
+    'pv', ['demo', 'stock_bar_1day', self.codes, 'open,high,low,close', 10]
+)
+```
+
+- `'pv'`: The alias or identifier used within the strategy to refer to this data.
+- `['demo', 'stock_bar_1day', self.codes, 'open,high,low,close', 10]`: A list of parameters specifying:
+  - `'demo'`: The library or dataset name.
+  - `'stock_bar_1day'`: The specific table or data source within the library.
+  - `self.codes`: The stock codes or identifiers for which the data is needed.
+  - `'open,high,low,close'`: The specific fields or columns of data required.
+  - `10`: The amount of data to retrieve (e.g., the number of rows, or the historical depth in days).
+
+#### 3. **Result of Subscribing**:
+When `subscribe_data` is called, the strategy sets up the necessary infrastructure to ensure that the specified data is fetched and available for use in subsequent calculations. This data is then stored in a `DataView3d` object, allowing easy access and manipulation.
+
+### Example in Code
+
+Here’s how the `subscribe_data` method is used in the `ReverseSignal` class:
+
+```python
+from transmatrix.strategy import SignalStrategy
+from transmatrix.data_api import create_data_view, NdarrayData, DataView3d
+from scipy.stats import zscore
+
+class ReverseSignal(SignalStrategy):
+    def init(self):
+        # Setting up a scheduler to trigger the on_clock method at 08:30
+        self.add_clock(milestones='08:30:00')
+        
+        # Subscribing to daily stock market data
+        self.subscribe_data(
+            'pv', ['demo', 'stock_bar_1day', self.codes, 'open,high,low,close', 10]
+        )
+        
+        # Declaring that 'pv' will be a DataView3d object
+        self.pv: DataView3d
+
+    def pre_transform(self):
+        # Accessing the subscribed data for calculations
+        pv = self.pv.to_dataframe()
+        ret = (pv['close'] / pv['close'].shift(1) - 1).fillna(0)  # Calculate daily returns
+        reverse = -ret.rolling(window=5, min_periods=5).mean().fillna(0)  # Take 5-day moving average and negate
+        reverse = zscore(reverse, axis=1, nan_policy='omit')  # Calculate z-score in the cross-section as the factor value
+        
+        self.reverse: DataView3d = create_data_view(
+            NdarrayData.from_dataframes({'reverse': reverse})
+        )
+        
+        self.reverse.align_with(self.pv)
+            
+    def on_clock(self):
+        # Updating the signal with the calculated factor
+        self.update_signal(self.reverse.get('reverse'))
+```
+
+### Summary
+
+In Python terminology, "subscribe" in this context refers to setting up the data requirements for a strategy. It involves specifying the data sources, fields, and other parameters so that the required data is available for processing when the strategy runs. This subscription mechanism ensures that the necessary data streams are continuously available, facilitating real-time data analysis and factor calculation.
+
